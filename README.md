@@ -1,1 +1,2 @@
 # pathfinding
+Harjoitustyö algoritmi polunetsintään
