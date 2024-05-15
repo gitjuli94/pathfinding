@@ -1,2 +1,2 @@
 # Pathfinding
-Kahden eri reitinhakualgotirmin vertailu
+Kahden eri reitinhakualgoritmin vertailu
