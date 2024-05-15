@@ -1,4 +1,0 @@
-#Viikkoraportti 1
-
-1. Tällä viikolla olen osallistunut aloitusluennolle sekä valinnut aiheen harjoitustyötä varten. Lisäksi olen luonut GitHub repositorion ja linkittänyt sen tietokoneelleni SSH salauksella. Olen rekisteröinyt projektin myös Labtooliin. Olen myös tehnyt määrittelydokumentin.
-2. 
