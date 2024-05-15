@@ -1,4 +1,4 @@
-#Viikkoraportti 1
+# Viikkoraportti 1
 
 1. Tällä viikolla olen osallistunut aloitusluennolle, tutustunut materiaaliin sekä valinnut aiheen harjoitustyötä varten (reitinhakualgoritmit). Lisäksi olen luonut GitHub repositorion ja linkittänyt sen tietokoneelleni SSH salauksella. Olen myös tehnyt määrittelydokumentin ja tutustunut JPS algoritmin materiaaleihin. Kurssia ei ollut vielä Labtoolissa joten en päässyt linkittämään projektia sinne (olen loppuviikon ulkomailla). Käytin tällä viikolla aikaa yhteensä n. 6h.
 
