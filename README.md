@@ -1,2 +1,2 @@
-# pathfinding
-Harjoitustyö algoritmi polunetsintään
+# Pathfinding
+Kahden eri reitinhakualgotirmin vertailu
