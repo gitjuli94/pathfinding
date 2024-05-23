@@ -18,7 +18,7 @@ def process_file(input_file_path, output_file_path):
         # Write the processed map to the output file
         with open(output_file_path, 'w') as output_file:
             for line in result_array:
-                output_file.write(",".join(line) + "\n")
+                output_file.write("[" + ",".join(line) + "]," + "\n")
 
         print(f"Map Processed, array written to {output_file_path}")
 
