@@ -1,3 +1,9 @@
+
+# Input and output files
+input_file_path = 'additional_scripts/Milan_256.map'
+output_file_path = 'additional_scripts/output.txt'
+
+
 def process_file(input_file_path, output_file_path):
     try:
         with open(input_file_path, 'r') as input_file:
@@ -27,6 +33,5 @@ def process_file(input_file_path, output_file_path):
     except Exception as e:
         print(f"Error: {e}")
 
-input_file_path = 'Shanghai_256.map'
-output_file_path = 'output.txt'
+
 process_file(input_file_path, output_file_path)
