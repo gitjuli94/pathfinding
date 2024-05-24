@@ -1,23 +1,24 @@
 """
 Dijkstra algorithm for shortest path finding.
 """
-
-import heapq
 import sys
-import os
+from pathlib import Path
 
-"""get the map matrices from a separate directory"""
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+#get the map matrices from a separate directory
+base_dir = Path(__file__).resolve().parent.parent
+sys.path.append(str(base_dir))
 
+from data.maps.simple import input_matrix
 from network import Generate_Network
-from maps.milan import input_matrix
+import heapq
+
 
 class Dijkstra:
     def __init__(self, matrix):
         network = Generate_Network(matrix)
         self.nodes = network.graph.keys()
         self.graph = network.graph
-        #print(self.graph)
+        print(self.graph)
         #print(self.nodes)
 
     def find_distances(self, start_node, end_node):
@@ -42,7 +43,8 @@ class Dijkstra:
                 return {
                     "shortestPath": reconstruct_path(came_from, end_node),
                     "visited": visited,
-                    "absoluteDistance": round(distances[end_node] + 1e-9, 1)  # Using round to handle floating point precision issues
+                    # Using round to handle floating point precision issues
+                    "absoluteDistance": round(distances[end_node] + 1e-9, 1)
                 }
             if node_a in visited:
                 continue
@@ -71,16 +73,18 @@ def reconstruct_path(came_from, current):
 
     return path
 
-# Example usage
-dijkstra = Dijkstra(input_matrix)
-start_node = (0, 0)
-end_node = (7, 0)
-result = dijkstra.find_distances(start_node, end_node)
+if __name__ == '__main__':
+    dijkstra = Dijkstra(input_matrix)
+    start_node = (0, 1)
+    end_node = (2, 1)
+    result = dijkstra.find_distances(start_node, end_node)
 
-if result:
-    shortest_path = result["shortestPath"]
-    absolute_distance = result["absoluteDistance"]
-    print("Shortest path:", shortest_path)
-    print("Absolute Distance:", absolute_distance)
-else:
-    print("No path found.")
+    if result:
+        shortest_path = result["shortestPath"]
+        absolute_distance = result["absoluteDistance"]
+        #visited = result["visited"]
+        print("Shortest path:", shortest_path)
+        print("Absolute Distance:", absolute_distance)
+        #print("visited: ", visited)
+    else:
+        print("No path found.")
