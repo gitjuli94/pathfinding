@@ -51,5 +51,6 @@ class TestDijkstra(unittest.TestCase):
         current = (2, 2)
         expected_path = [(0, 0), (1, 1), (2, 2)]
         self.assertEqual(self.dijkstra.reconstruct_path(came_from, current), expected_path)
+
 if __name__ == '__main__':
     unittest.main()
