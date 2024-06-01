@@ -24,7 +24,32 @@ class TestDijkstra(unittest.TestCase):
         self.dijkstra = Dijkstra(self.test_matrix)
 
     def test_shortest_path_simple_graph(self):
-        # Test with a simple graph
-        shortest_path = self.dijkstra.find_distances((0,1), (2,1))["absoluteDistance"]
-        print("polku:",shortest_path)
-        self.assertEqual(shortest_path, (2.0))
+        # Test shortest distance with the test graph
+        result = self.dijkstra.find_distances((0,1), (2,1))
+        #print("polku:",shortest_path)
+        self.assertEqual(result["absoluteDistance"], (2.0))
+        self.assertEqual(result["shortestPath"], [(0, 1), (1, 1), (2, 1)])
+
+    def test_no_path(self):
+        # Test no path with the test graph
+        result = self.dijkstra.find_distances((0,1), (3,1))
+        #print("result:",result)
+        self.assertEqual(result, False)
+
+    def test_invalid_nodes(self):
+        # Test when the nodes are not within the graph
+        result = self.dijkstra.find_distances((0,1), (4,1))
+        #print("result:",result)
+        self.assertEqual(result, False)
+        result = self.dijkstra.find_distances((4,1), (3,1))
+        #self.assertEqual(result, (-1))
+        self.assertFalse(result)
+
+    def test_reconstruct_path(self):
+        # Test the path reconstruction function
+        came_from = {(1, 1): (0, 0), (2, 2): (1, 1)}
+        current = (2, 2)
+        expected_path = [(0, 0), (1, 1), (2, 2)]
+        self.assertEqual(self.dijkstra.reconstruct_path(came_from, current), expected_path)
+if __name__ == '__main__':
+    unittest.main()

@@ -3,6 +3,8 @@ Dijkstra algorithm for shortest path finding.
 """
 import sys
 from pathlib import Path
+import heapq
+import time
 
 #get the map matrices from a separate directory
 base_dir = Path(__file__).resolve().parent.parent
@@ -10,7 +12,7 @@ sys.path.append(str(base_dir))
 
 from data.maps.simple import input_matrix
 from network import Generate_Network
-import heapq
+
 
 
 class Dijkstra:
@@ -18,8 +20,8 @@ class Dijkstra:
         network = Generate_Network(matrix)
         self.nodes = network.graph.keys()
         self.graph = network.graph
-        print(self.graph)
-        #print(self.nodes)
+       # print(self.graph)
+       # print(self.nodes)
 
     def find_distances(self, start_node, end_node):
         result = True
@@ -31,27 +33,30 @@ class Dijkstra:
         came_from = {}  # Dictionary to store predecessors
         queue = []
         heapq.heappush(queue, (0, start_node))
-
         visited = set()
-        if end_node not in self.nodes or start_node not in self.nodes:
-            result = False
-            return result
+        if end_node not in self.graph or start_node not in self.graph:
+            print("Check that start and end nodes are correctly specified.")
+            return False
 
         while queue:
+            #choose 2nd (=[1]) item from the tuple (which is the node itself):
+            #with a heap structure the first in the queue is always the one with the smallest distance
+            #because the heap structure is saved as a tuple : (distance, node)
             node_a = heapq.heappop(queue)[1]
             if node_a == end_node:
                 return {
-                    "shortestPath": reconstruct_path(came_from, end_node),
+                    "shortestPath": self.reconstruct_path(came_from, end_node),
                     "visited": visited,
-                    # Using round to handle floating point precision issues
-                    "absoluteDistance": round(distances[end_node] + 1e-9, 1)
+                    #using round to handle floating point precision issues
+                    #"absoluteDistance": round(distances[end_node] + 1e-9, 1) -> unnecessary?
+                    "absoluteDistance": round(distances[end_node], 1)
                 }
             if node_a in visited:
                 continue
             visited.add(node_a)
 
-            for node_b, weight in self.graph[node_a]:
-                new_distance = distances[node_a] + weight
+            for node_b, weight in self.graph[node_a]:#go through all node a's neighbors and distances
+                new_distance = distances[node_a] + weight#calculate new distance
                 if new_distance < distances[node_b]:
                     distances[node_b] = new_distance
                     new_pair = (new_distance, node_b)
@@ -59,27 +64,29 @@ class Dijkstra:
                     came_from[node_b] = node_a  # Update predecessor
 
         if distances[end_node] == float("inf"):
-            return -1
+            return False
 
-        #return distances
-        #return distances[end_node]#, came_from
+    def reconstruct_path(self, came_from, current):
+        path = [current]
 
-def reconstruct_path(came_from, current):
-    path = [current]
+        while current in came_from:
+            current = came_from[current]
+            path.insert(0, current)
 
-    while current in came_from:
-        current = came_from[current]
-        path.insert(0, current)
-
-    return path
+        return path
 
 if __name__ == '__main__':
     dijkstra = Dijkstra(input_matrix)
     start_node = (0, 1)
-    end_node = (2, 1)
+    end_node = (1, 1)
+
+    #measure path finding time
+    start_time = time.time()
     result = dijkstra.find_distances(start_node, end_node)
+    end_time = time.time()
 
     if result:
+        print(f"Path finding execution, Dijkstra: {round((end_time - start_time), 6):.6f} s")
         shortest_path = result["shortestPath"]
         absolute_distance = result["absoluteDistance"]
         #visited = result["visited"]
@@ -88,3 +95,9 @@ if __name__ == '__main__':
         #print("visited: ", visited)
     else:
         print("No path found.")
+
+
+"""
+sources:
+https://tira.mooc.fi/kevat-2024/osa14/
+"""
