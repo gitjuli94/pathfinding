@@ -27,7 +27,7 @@ class Graph:
     def adjacent_edges(self, vertex, outgoing=True):
         adj_edges = self._outgoing if outgoing else self._incoming
         for edge in adj_edges[vertex].values():
-            yield edge
+            yield edge #iterate over each of the edges for the vertex
 
     def add_vertex(self, entity=None, h=None, cost=None):
         vertex = self.Vertex(entity, h, cost)
@@ -59,40 +59,40 @@ class Graph:
         # Add vertices
         for i in range(m):
             for j in range(n):
-                if self.matrix[i][j] == 0:  # Add vertex only if it's a path (0)
+                if self.matrix[i][j] == 0:  # Add vertex only if it's on a path (0)
                     vertex = self.add_vertex((i, j))
                     vertices[(i, j)] = vertex
                     print(f"Added vertex: {vertex.entity}")
 
-        # Add edges
-        for i in range(m):
-            for j in range(n):
+        # Add edges in form add_edge(origin, destination, weight, direction)
+        for i in range(m):  # rows
+            for j in range(n):  # columns
                 if self.matrix[i][j] == 0:  # Only consider paths (0)
                     current_vertex = vertices[(i, j)]
-                    if j < n - 1 and self.matrix[i][j + 1] == 0:
+                    if j < n - 1 and self.matrix[i][j + 1] == 0:  # Right
                         self.add_edge(current_vertex, vertices[(i, j + 1)], weight=cost_hv, direction=0)
-                        print(f"Added edge from {current_vertex.entity} to {(i, j + 1)} with direction 0")
-                    if j > 0 and self.matrix[i][j - 1] == 0:
+                        #print(f"Added edge from {current_vertex.entity} to {(i, j + 1)} with direction 0")
+                    if j > 0 and self.matrix[i][j - 1] == 0:  # Left
                         self.add_edge(current_vertex, vertices[(i, j - 1)], weight=cost_hv, direction=1)
-                        print(f"Added edge from {current_vertex.entity} to {(i, j - 1)} with direction 1")
-                    if i < m - 1 and self.matrix[i + 1][j] == 0:
+                        #print(f"Added edge from {current_vertex.entity} to {(i, j - 1)} with direction 1")
+                    if i < m - 1 and self.matrix[i + 1][j] == 0:  # Down
                         self.add_edge(current_vertex, vertices[(i + 1, j)], weight=cost_hv, direction=6)
-                        print(f"Added edge from {current_vertex.entity} to {(i + 1, j)} with direction 6")
-                    if i > 0 and self.matrix[i - 1][j] == 0:
+                        #print(f"Added edge from {current_vertex.entity} to {(i + 1, j)} with direction 6")
+                    if i > 0 and self.matrix[i - 1][j] == 0:  # Up
                         self.add_edge(current_vertex, vertices[(i - 1, j)], weight=cost_hv, direction=2)
-                        print(f"Added edge from {current_vertex.entity} to {(i - 1, j)} with direction 2")
-                    if i < m - 1 and j < n - 1 and self.matrix[i + 1][j + 1] == 0:
+                        #print(f"Added edge from {current_vertex.entity} to {(i - 1, j)} with direction 2")
+                    if i < m - 1 and j < n - 1 and self.matrix[i + 1][j + 1] == 0:  # Down Right
                         self.add_edge(current_vertex, vertices[(i + 1, j + 1)], weight=cost_di, direction=7)
-                        print(f"Added edge from {current_vertex.entity} to {(i + 1, j + 1)} with direction 7")
-                    if i < m - 1 and j > 0 and self.matrix[i + 1][j - 1] == 0:
+                        #print(f"Added edge from {current_vertex.entity} to {(i + 1, j + 1)} with direction 7")
+                    if i < m - 1 and j > 0 and self.matrix[i + 1][j - 1] == 0:  # Down Left
                         self.add_edge(current_vertex, vertices[(i + 1, j - 1)], weight=cost_di, direction=5)
-                        print(f"Added edge from {current_vertex.entity} to {(i + 1, j - 1)} with direction 5")
-                    if i > 0 and j > 0 and self.matrix[i - 1][j - 1] == 0:
+                        #print(f"Added edge from {current_vertex.entity} to {(i + 1, j - 1)} with direction 5")
+                    if i > 0 and j > 0 and self.matrix[i - 1][j - 1] == 0:  # Up Left
                         self.add_edge(current_vertex, vertices[(i - 1, j - 1)], weight=cost_di, direction=3)
-                        print(f"Added edge from {current_vertex.entity} to {(i - 1, j - 1)} with direction 3")
-                    if i > 0 and j < n - 1 and self.matrix[i - 1][j + 1] == 0:
+                        #print(f"Added edge from {current_vertex.entity} to {(i - 1, j - 1)} with direction 3")
+                    if i > 0 and j < n - 1 and self.matrix[i - 1][j + 1] == 0:  # Up Right
                         self.add_edge(current_vertex, vertices[(i - 1, j + 1)], weight=cost_di, direction=4)
-                        print(f"Added edge from {current_vertex.entity} to {(i - 1, j + 1)} with direction 4")
+                        #print(f"Added edge from {current_vertex.entity} to {(i - 1, j + 1)} with direction 4")
 
     def print_graph(self):
         for vertex in self._outgoing:
