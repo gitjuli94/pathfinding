@@ -1,17 +1,13 @@
 """
 Dijkstra algorithm for shortest path finding.
+sources:
+https://tira.mooc.fi/kevat-2024/osa14/
 """
-import sys
-from pathlib import Path
+
+#from pathlib import Path
 import heapq
-import time
 
-#get the map matrices from a separate directory
-base_dir = Path(__file__).resolve().parent.parent
-sys.path.append(str(base_dir))
-
-from data.maps.simple import input_matrix
-from network import Generate_Network
+from algorithms.network import Generate_Network
 
 
 
@@ -75,29 +71,5 @@ class Dijkstra:
 
         return path
 
-if __name__ == '__main__':
-    dijkstra = Dijkstra(input_matrix)
-    start_node = (0, 1)
-    end_node = (1, 1)
-
-    #measure path finding time
-    start_time = time.time()
-    result = dijkstra.find_distances(start_node, end_node)
-    end_time = time.time()
-
-    if result:
-        print(f"Path finding execution, Dijkstra: {round((end_time - start_time), 6):.6f} s")
-        shortest_path = result["shortestPath"]
-        absolute_distance = result["absoluteDistance"]
-        #visited = result["visited"]
-        print("Shortest path:", shortest_path)
-        print("Absolute Distance:", absolute_distance)
-        #print("visited: ", visited)
-    else:
-        print("No path found.")
 
 
-"""
-sources:
-https://tira.mooc.fi/kevat-2024/osa14/
-"""

@@ -5,6 +5,9 @@ A graphical user interface to test and visualize the algorithms.
 import importlib
 import matplotlib.pyplot as plt
 import numpy as np
+from algorithms.dijkstra import Dijkstra
+from algorithms.network import Generate_Network
+import time
 
 import tkinter as tk
 #from tkinter import messagebox
@@ -12,8 +15,7 @@ from tkinter import *
 
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-#from algorithms.JPS import jps  # Adjust the import based on your function
-#from algorithms.dijkstra import dijkstra  # Adjust the import based on your function
+
 
 class PathFindingApp:
     def __init__(self, root):
@@ -22,23 +24,28 @@ class PathFindingApp:
         self.root = root
         self.root.title("Path Finding Algorithms")
         self.map = None
+
         self.start_coord = None
         self.end_coord = None
+        self.selecting_start = False
+        self.selecting_end = False
 
-        # Create input fields and buttons
+        #Create input fields and buttons
         input_frame = tk.Frame(root)
-        input_frame.pack(side=tk.LEFT)
+        input_frame.grid(row=0, column=0, sticky='NS')
 
-        self.start_button = tk.Button(input_frame, text="Startti", command=self.click)
+        #buttons for interface
+        self.start_button = tk.Button(input_frame, text="Startti", command=self.click_start)
         self.start_button.grid(row=0, column=0, sticky = 'WE', padx=4)
 
-        self.end_button = tk.Button(input_frame, text="End", command=self.click)
+        self.end_button = tk.Button(input_frame, text="End", command=self.click_end)
         self.end_button.grid(row=1, column=0, sticky = 'WE', padx=4)
 
         self.map_options = tk.StringVar()
-        self.map_options.set("simple")  # Default map option
+        self.map_options.set("simple1")  # Default map option
 
-        map_menu = tk.OptionMenu(input_frame, self.map_options, "Milan", "Shanghai", "NewYork")
+        map_menu = tk.OptionMenu(input_frame, self.map_options, "simple1", "simple2")
+        #map_menu = tk.OptionMenu(input_frame, self.map_options, "Milan", "Shanghai", "NewYork")#final options
         map_menu.grid(row=2, column=0, sticky = 'WE', padx=4)
 
         self.load_map_button = tk.Button(input_frame, text="Load Map", command=self.load_map)
@@ -50,14 +57,36 @@ class PathFindingApp:
         self.run_dijkstra_button = tk.Button(input_frame, text="Run Dijkstra", command=self.run_dijkstra)
         self.run_dijkstra_button.grid(row=5, column=0, sticky = 'WE', padx=4)
 
+        #labels to print  Dijkstra results
+        self.label1 = tk.Label(root, text="", font=("Helvetica", 16))
+        self.label1.grid(row=6, column=0, columnspan=2, sticky='WE', padx=4)
+        self.label2 = tk.Label(root, text="", font=("Helvetica", 16))
+        self.label2.grid(row=7, column=0, columnspan=2, sticky='WE', padx=4)
+        self.label3 = tk.Label(root, text="", font=("Helvetica", 16))
+        self.label3.grid(row=8, column=0, columnspan=2, sticky='WE', padx=4)
+
+        #labels to print JPS results
+        self.label4 = tk.Label(root, text="", font=("Helvetica", 16))
+        self.label4.grid(row=10, column=0, columnspan=2, sticky='WE', padx=4)
+        self.label5 = tk.Label(root, text="", font=("Helvetica", 16))
+        self.label5.grid(row=11, column=0, columnspan=2, sticky='WE', padx=4)
+        self.label6 = tk.Label(root, text="", font=("Helvetica", 16))
+        self.label6.grid(row=12, column=0, columnspan=2, sticky='WE', padx=4)
+
+        #map visualization configuration
         self.canvas = tk.Canvas(root, width=500, height=500, bg="white")
+        self.canvas.grid(row=0, column=1, rowspan=7, sticky = 'WE', padx=4)
 
-        self.canvas.pack()
-
-    def click(self):
         self.canvas.bind("<Button-1>", self.on_canvas_click)
 
+    def click_start(self):
+        self.selecting_start = True
+        self.selecting_end = False
 
+
+    def click_end(self):
+        self.selecting_start = False
+        self.selecting_end = True
 
     def on_canvas_click(self, event):
 
@@ -65,24 +94,36 @@ class PathFindingApp:
         col = event.x // self.cell_size
 
         self.coord = (row, col)
-        x0 = self.coord[0] * self.cell_size
-        y0 = self.coord[1] * self.cell_size
+        x0 = col * self.cell_size
+        y0 = row * self.cell_size
         x1 = x0 + self.cell_size
         y1 = y0 + self.cell_size
 
-        if self.start_coord is None:
+
+        if self.selecting_start:
             if self.map[row][col] == 0:
+                self.end_coord = None
+                if self.start_coord is not None: #reset previous to white
+                    self.draw_map()
+
                 self.start_coord = self.coord
+                self.prev_start_coord = self.start_coord #save as previous coordinates
                 self.canvas.create_rectangle(x0, y0, x1, y1, fill="green")
                 print("start: ", self.start_coord)
+                self.selecting_start = False
             else:
                 print("out of free zone")
 
-        elif self.end_coord is None:
+        elif self.selecting_end:
             if self.map[row][col] == 0:
+                if self.end_coord is not None: #reset previous to white
+                    return
+
                 self.end_coord = self.coord
-                self.canvas.create_rectangle(x0, y0, x1, y1, fill="red")
+                self.prev_end_coord = self.end_coord #save as previous coordinates
+                self.canvas.create_rectangle(x0, y0, x1, y1, fill="blue")
                 print("end: ", self.end_coord)
+                self.selecting_end = False
             else:
                 print("out of free zone")
 
@@ -93,7 +134,9 @@ class PathFindingApp:
         # Load a map here
         try:
             map_module = importlib.import_module(f'data.maps.{map_name.lower()}')
+            self.matrix = map_module.input_matrix
             self.map = np.array(map_module.input_matrix)
+            print("map loaded")
             #messagebox.showinfo("Map Loaded")
             self.draw_map()
         except ImportError as e:
@@ -124,19 +167,50 @@ class PathFindingApp:
                 color = "black" if self.map[i][j] == 1 else "white"
                 self.canvas.create_rectangle(x0, y0, x1, y1, fill=color)
 
+    def draw_route(self, route):
+
+        for node in route:
+            if node != self.start_coord and node != self.end_coord:
+                x0 = node[1] * self.cell_size
+                y0 = node[0] * self.cell_size
+                x1 = x0 + self.cell_size
+                y1 = y0 + self.cell_size
+                self.canvas.create_rectangle(x0, y0, x1, y1, fill="yellow")
+
+
     def run_jps(self):
         pass
-        """start = tuple(map(int, self.start_entry.get().split(',')))
-        end = tuple(map(int, self.end_entry.get().split(',')))
-        path = jps(self.map, start, end, 25, self.map.flatten())
-        draw_grid(self.canvas, path)"""
 
     def run_dijkstra(self):
-        pass
-        """start = tuple(map(int, self.start_entry.get().split(',')))
-        end = tuple(map(int, self.end_entry.get().split(',')))
-        path = dijkstra(self.map, start, end, 25, self.map.flatten())
-        draw_grid(self.canvas, path)"""
+        dijkstra = Dijkstra(self.map)
+        start = self.start_coord
+        end = self.end_coord
+
+        #measure path finding time
+        start_time = time.time()
+        result = dijkstra.find_distances(start, end)
+        end_time = time.time()
+
+        if result:
+            #print(f"Path finding execution, Dijkstra: {round((end_time - start_time), 6):.6f} s")
+            shortest_path = result["shortestPath"]
+            absolute_distance = result["absoluteDistance"]
+            visited = len(result["visited"])
+            #print("Shortest path:", shortest_path)
+            #print("Absolute Distance:", absolute_distance)
+            #print("visited: ", visited)
+            self.label1.config(text=f"Path finding execution, Dijkstra: {round((end_time - start_time), 6):.6f} s")
+            self.label2.config(text=f"Absolute distance: {absolute_distance}")
+            self.label3.config(text=f"Number of visited nodes: {visited}")
+            self.draw_route(shortest_path)
+        else:
+            self.label1.config(text=f"No path found.")
+            print("No path found.")
+
+
+
+
+
 
 # Main
 if __name__ == "__main__":

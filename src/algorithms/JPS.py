@@ -1,5 +1,7 @@
 """
 Jump point search algorithm for shortest path finding.
+sources:
+https://blog.finxter.com/jump-search-algorithm-in-python-a-helpful-guide-with-video/
 """
 import time
 from graph import Graph
@@ -13,7 +15,7 @@ from pathlib import Path
 base_dir = Path(__file__).resolve().parent.parent
 sys.path.append(str(base_dir))
 
-from data.maps.simple import input_matrix
+from src.data.maps.simple1 import input_matrix
 
 
 # Just a dummy object attached with a dummy function...
@@ -130,72 +132,75 @@ def jump(graph, vertex, direction, cost_so_far, goal_vertex):
     jump_point, cost = jump(graph, jump_point, direction, cost, goal_vertex)
     return jump_point, cost
 
+class JPS:
+    def __init__(self, matrix):
+        pass
 
-def jps(graph, start_vertex, goal_vertex):
-    # Create the priority queue for open vertices.
-    jump_points_pq = PriorityQueue()
-    if start_vertex not in vertices or goal_vertex not in vertices:
-        return None
-    start_vertex = vertices[start_vertex]
-    start_vertex.cost = 0
+    def jps(graph, start_vertex, goal_vertex):
+        # Create the priority queue for open vertices.
+        jump_points_pq = PriorityQueue()
+        if start_vertex not in vertices or goal_vertex not in vertices:
+            return None
+        start_vertex = vertices[start_vertex]
+        start_vertex.cost = 0
 
-    start_vertex.h = 0
+        start_vertex.h = 0
 
-    # Adds the start vertex to the priority queue.
-    #print(f'Visiting/queueing vertex {start_vertex.entity}')
+        # Adds the start vertex to the priority queue.
+        #print(f'Visiting/queueing vertex {start_vertex.entity}')
 
-    jump_points_pq.put(start_vertex)
-    print('Prioritized vertices (v, cost, dir):',
-          *((vert.entity, vert.cost, vert.direction) for vert in jump_points_pq.queue),
-          end=2 * '\n')
-
-    # The starting vertex is visited first and has no leading edges.
-    visited[start_vertex.entity] = None
-
-    # Loops until the priority list gets empty.
-    while not jump_points_pq.empty():
-        # Gets the previously calculated jump_point with the lowest cost.
-        jpoint_prev = jump_points_pq.get()
-        print(f'Exploring vertex {jpoint_prev.entity}')
-
-        # If the vertex being explored is a goal vertex, the algorithm ends.
-        if jpoint_prev.entity == goal_vertex:
-            return jpoint_prev
-
-        # Finds the vertex neighbours (natural and forced).
-        neighbours = prune(graph, jpoint_prev)
-
-        for direction in neighbours.vertices:
-            jpoint, cost = jump(graph, jpoint_prev, direction, jpoint_prev.cost, goal_vertex)
-
-            if jpoint is None or vertices.get(jpoint, None) in explored:
-                continue
-
-            # Calculates the jump point's heuristic value.
-            if jpoint.h is None:
-                jpoint.h = tuple(map(lambda x, y: abs(x - y), jpoint.entity, goal_vertex))
-                jpoint.h = abs(jpoint.h[0] - jpoint.h[1]) * cost_hv \
-                    + min(jpoint.h[0], jpoint.h[1]) * cost_di
-
-            # Prevents reinsertion to the priority queue. The endpoint distance value will be updated.
-            if jpoint.entity not in visited:
-                print(f'Visiting/queueing vertex {jpoint.entity}.')
-                visited[jpoint.entity] = jpoint_prev.entity
-                jump_points_pq.put(jpoint)
-
-            if jpoint.cost is None or jpoint.cost - jpoint.h > cost - jpoint_prev.h:
-                jpoint.cost = cost - jpoint_prev.h + jpoint.h
-                jpoint.direction = direction
-
-            # Forces the priority queue to recalculate in case of an
-            # inner vertex update resulting with the highest priority.
-            if not jump_points_pq.empty():
-                jump_points_pq.put(jump_points_pq.get())
-
+        jump_points_pq.put(start_vertex)
         print('Prioritized vertices (v, cost, dir):',
-              *((vert.entity, vert.cost, vert.direction) for vert in jump_points_pq.queue), end=2 * '\n')
-        # The vertex is used for update and put aside.
-        explored.append(jpoint_prev)
+            *((vert.entity, vert.cost, vert.direction) for vert in jump_points_pq.queue),
+            end=2 * '\n')
+
+        # The starting vertex is visited first and has no leading edges.
+        visited[start_vertex.entity] = None
+
+        # Loops until the priority list gets empty.
+        while not jump_points_pq.empty():
+            # Gets the previously calculated jump_point with the lowest cost.
+            jpoint_prev = jump_points_pq.get()
+            print(f'Exploring vertex {jpoint_prev.entity}')
+
+            # If the vertex being explored is a goal vertex, the algorithm ends.
+            if jpoint_prev.entity == goal_vertex:
+                return jpoint_prev
+
+            # Finds the vertex neighbours (natural and forced).
+            neighbours = prune(graph, jpoint_prev)
+
+            for direction in neighbours.vertices:
+                jpoint, cost = jump(graph, jpoint_prev, direction, jpoint_prev.cost, goal_vertex)
+
+                if jpoint is None or vertices.get(jpoint, None) in explored:
+                    continue
+
+                # Calculates the jump point's heuristic value.
+                if jpoint.h is None:
+                    jpoint.h = tuple(map(lambda x, y: abs(x - y), jpoint.entity, goal_vertex))
+                    jpoint.h = abs(jpoint.h[0] - jpoint.h[1]) * cost_hv \
+                        + min(jpoint.h[0], jpoint.h[1]) * cost_di
+
+                # Prevents reinsertion to the priority queue. The endpoint distance value will be updated.
+                if jpoint.entity not in visited:
+                    print(f'Visiting/queueing vertex {jpoint.entity}.')
+                    visited[jpoint.entity] = jpoint_prev.entity
+                    jump_points_pq.put(jpoint)
+
+                if jpoint.cost is None or jpoint.cost - jpoint.h > cost - jpoint_prev.h:
+                    jpoint.cost = cost - jpoint_prev.h + jpoint.h
+                    jpoint.direction = direction
+
+                # Forces the priority queue to recalculate in case of an
+                # inner vertex update resulting with the highest priority.
+                if not jump_points_pq.empty():
+                    jump_points_pq.put(jump_points_pq.get())
+
+            print('Prioritized vertices (v, cost, dir):',
+                *((vert.entity, vert.cost, vert.direction) for vert in jump_points_pq.queue), end=2 * '\n')
+            # The vertex is used for update and put aside.
+            explored.append(jpoint_prev)
 
 if __name__ == '__main__':
     # Initializes an empty graph (object).
@@ -239,12 +244,9 @@ if __name__ == '__main__':
             path_vertex = visited[path_vertex]
         print('Search path found:', end=' ')
         # The path is reversed and starts with the root vertex.
-        print(*reversed(path), sep=' -> ')
+        print(*reversed(path))
     # Otherwise...
     else:
         print('\nEntity is not found')
 
-"""
-sources:
-https://blog.finxter.com/jump-search-algorithm-in-python-a-helpful-guide-with-video/
-"""
+
