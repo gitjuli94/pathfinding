@@ -1,5 +1,6 @@
 """
 A graphical user interface to test and visualize the algorithms.
+Built using Tkinter which is a standard Python GUI library.
 """
 
 import importlib
