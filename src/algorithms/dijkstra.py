@@ -4,12 +4,8 @@ sources:
 https://tira.mooc.fi/kevat-2024/osa14/
 """
 
-#from pathlib import Path
 import heapq
-
 from algorithms.network import Generate_Network
-
-
 
 class Dijkstra:
     def __init__(self, matrix):

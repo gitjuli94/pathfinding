@@ -1,47 +1,38 @@
 """
-Create a network of nodes and edges for the JPS algorithm using a map with 1/0 syntax as an input.
-Returns a dictionary with the node as the key and the list of adjacent available nodes as the value.
+Create a network of nodes and edges for the JPS algorithm using a map (matrix) with 1/0 syntax as an input.
 """
-
-import sys
-from pathlib import Path
-
-
-#get the map matrices from a separate directory
-base_dir = Path(__file__).resolve().parent.parent
-sys.path.append(str(base_dir))
-
-from data.maps.simple import input_matrix
 
 import math
 
 class Graph:
     def __init__(self, input_matrix, directed=False):
         self._outgoing = {}
-        self._incoming = {} if directed else self._outgoing
+        #self._incoming = {} if directed else self._outgoing
+        self._incoming = self._outgoing
         self.matrix = input_matrix
 
-    def is_directed(self):
-        return self._incoming is not self._outgoing
+    #def is_directed(self):
+        #return self._incoming is not self._outgoing
 
     def adjacent_edges(self, vertex, outgoing=True):
-        adj_edges = self._outgoing if outgoing else self._incoming
+        adj_edges = self._outgoing# if outgoing else self._incoming
         for edge in adj_edges[vertex].values():
             yield edge #iterate over each of the edges for the vertex
 
     def add_vertex(self, entity=None, h=None, cost=None):
         vertex = self.Vertex(entity, h, cost)
         self._outgoing[vertex] = {}
-        if self.is_directed():
-            self._incoming[vertex] = {}
+        #if self.is_directed():
+            #self._incoming[vertex] = {}
         return vertex
+
 
     def add_edge(self, origin, destination, weight=None, direction=None):
         edge = self.Edge(origin, destination, weight, direction)
         self._outgoing[origin][destination] = edge
-        if not self.is_directed():
-            edge = self.Edge(destination, origin, weight, (direction + 4) % 8)
-            self._incoming[destination][origin] = edge
+        #add edges to both directions
+        edge = self.Edge(destination, origin, weight, (direction + 4) % 8) # +4 means rotation of 180deg of the direction
+        self._incoming[destination][origin] = edge
 
     def vertices(self):
         return self._outgoing.keys()
@@ -59,40 +50,30 @@ class Graph:
         # Add vertices
         for i in range(m):
             for j in range(n):
-                if self.matrix[i][j] == 0:  # Add vertex only if it's on a path (0)
-                    vertex = self.add_vertex((i, j))
-                    vertices[(i, j)] = vertex
-                    print(f"Added vertex: {vertex.entity}")
+                vertex = self.add_vertex((i, j))
+                vertex.obstacle = self.matrix[i][j] == 1  # Mark as obstacle if the matrix entry is 1
+                vertices[(i, j)] = vertex
+                #print(f"Added vertex: {vertex.entity}")
 
         # Add edges in form add_edge(origin, destination, weight, direction)
         for i in range(m):  # rows
             for j in range(n):  # columns
-                if self.matrix[i][j] == 0:  # Only consider paths (0)
+                if not vertices[(i, j)].obstacle:  # Only consider non-obstacle vertices
                     current_vertex = vertices[(i, j)]
-                    if j < n - 1 and self.matrix[i][j + 1] == 0:  # Right
+                    #four directions added. the opposite directions (rotation with 180deg)
+                    #are handled within JPS.change_dir (by adding 4 in the direction)
+                    if j < n - 1:  # horizontal
                         self.add_edge(current_vertex, vertices[(i, j + 1)], weight=cost_hv, direction=0)
-                        #print(f"Added edge from {current_vertex.entity} to {(i, j + 1)} with direction 0")
-                    if j > 0 and self.matrix[i][j - 1] == 0:  # Left
-                        self.add_edge(current_vertex, vertices[(i, j - 1)], weight=cost_hv, direction=1)
-                        #print(f"Added edge from {current_vertex.entity} to {(i, j - 1)} with direction 1")
-                    if i < m - 1 and self.matrix[i + 1][j] == 0:  # Down
+
+                    if i < m - 1:  # vertical
                         self.add_edge(current_vertex, vertices[(i + 1, j)], weight=cost_hv, direction=6)
-                        #print(f"Added edge from {current_vertex.entity} to {(i + 1, j)} with direction 6")
-                    if i > 0 and self.matrix[i - 1][j] == 0:  # Up
-                        self.add_edge(current_vertex, vertices[(i - 1, j)], weight=cost_hv, direction=2)
-                        #print(f"Added edge from {current_vertex.entity} to {(i - 1, j)} with direction 2")
-                    if i < m - 1 and j < n - 1 and self.matrix[i + 1][j + 1] == 0:  # Down Right
+
+                    if i < m - 1 and j < n - 1:  # left Diagonal
                         self.add_edge(current_vertex, vertices[(i + 1, j + 1)], weight=cost_di, direction=7)
-                        #print(f"Added edge from {current_vertex.entity} to {(i + 1, j + 1)} with direction 7")
-                    if i < m - 1 and j > 0 and self.matrix[i + 1][j - 1] == 0:  # Down Left
+
+                    if i < m - 1 and j > 0 and self.matrix[i + 1][j - 1] == 0:  # right Diagonal
                         self.add_edge(current_vertex, vertices[(i + 1, j - 1)], weight=cost_di, direction=5)
-                        #print(f"Added edge from {current_vertex.entity} to {(i + 1, j - 1)} with direction 5")
-                    if i > 0 and j > 0 and self.matrix[i - 1][j - 1] == 0:  # Up Left
-                        self.add_edge(current_vertex, vertices[(i - 1, j - 1)], weight=cost_di, direction=3)
-                        #print(f"Added edge from {current_vertex.entity} to {(i - 1, j - 1)} with direction 3")
-                    if i > 0 and j < n - 1 and self.matrix[i - 1][j + 1] == 0:  # Up Right
-                        self.add_edge(current_vertex, vertices[(i - 1, j + 1)], weight=cost_di, direction=4)
-                        #print(f"Added edge from {current_vertex.entity} to {(i - 1, j + 1)} with direction 4")
+
 
     def print_graph(self):
         for vertex in self._outgoing:
@@ -197,5 +178,6 @@ class Graph:
             return hash((self._origin, self._destination))
 
 
-
-#graph.print_graph()
+"""g=Graph(input_matrix)
+g.create_graph()
+g.print_graph()"""
