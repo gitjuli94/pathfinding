@@ -14,10 +14,6 @@ import tkinter as tk
 from tkinter import messagebox
 from tkinter import *
 
-
-#from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-
-
 class PathFindingApp:
     def __init__(self, root):
         self.cell_size = 15
