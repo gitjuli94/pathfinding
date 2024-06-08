@@ -3,25 +3,18 @@ Jump point search algorithm for shortest path finding.
 sources:
 https://blog.finxter.com/jump-search-algorithm-in-python-a-helpful-guide-with-video/
 """
-import time
+
 import math
-from graph import Graph
+from algorithms.graph import Graph
 from queue import PriorityQueue # = a standard library in python, instead of heapq
 from collections import namedtuple
-import sys
-from pathlib import Path
 
 
-#get the map matrices from a separate directory
-base_dir = Path(__file__).resolve().parent.parent
-sys.path.append(str(base_dir))
+# A dummy object with the obstable attribute
+class DummyObject:
+    def __init__(self):
+        self.obstacle = True
 
-from data.maps.simple2 import input_matrix
-
-
-# Just a dummy object attached with a dummy function...
-class Object:
-    pass
 
 
 class JPS:
@@ -34,6 +27,7 @@ class JPS:
 
 
     def prune(self, vertex, direction=None):
+        # identify which neighbors of a given vertex should be considered for further exploration
         neighbours = {}
         forced_neighbours_exist = True
         if direction is None:
@@ -45,8 +39,8 @@ class JPS:
 
         # ...right here :-) We use it to ensure availability of the property
         # when the None object gets returned from the 'neighbours' dictionary.
-        o = Object()
-        o.obstacle = lambda: True
+        dummy = DummyObject()
+        #o.obstacle = lambda: True
 
         # Collects all the surrounding vertices in a dictionary and
         # marks them with the search direction
@@ -64,23 +58,25 @@ class JPS:
             # Parent is never a neighbour candidate
             neighbours.pop(self.change_dir(direction, 4), None)
 
-            # Trivial case - check if some of natural neighbours are obstacles
+            # Check natural neighbours (directly reachable nodes) obstacles
             for idx in range(-is_diagonal, is_diagonal + 1):
-                if neighbours.get(self.change_dir(direction, idx), o).obstacle:
+                if neighbours.get(self.change_dir(direction, idx), dummy).obstacle:
                     neighbours.pop(self.change_dir(direction, idx), None)
 
-            # Non-trivial case of potentially forced neighbours (left)
-            if neighbours.get(self.change_dir(leftmost_dir, -1), o).obstacle \
-                    or not neighbours.get(leftmost_dir, o).obstacle:
+            # Check forced neighbours (left)
+            # (forced neighbors are those that must be considered due to the presence of obstacles)
+            if neighbours.get(self.change_dir(leftmost_dir, -1), dummy).obstacle \
+                    or not neighbours.get(leftmost_dir, dummy).obstacle:
                 # Discards the forced neighbour candidate
                 neighbours.pop(self.change_dir(leftmost_dir, -1), None)
             else:
                 forced_neighbours_exist = True
             neighbours.pop(leftmost_dir, None)
 
-            # Non-trivial case of potentially forced neighbours (right)
-            if neighbours.get(self.change_dir(rightmost_dir, 1), o).obstacle \
-                    or not neighbours.get(rightmost_dir, o).obstacle:
+            # Check forced neighbours (right)
+            # (forced neighbors are those that must be considered due to the presence of obstacles)
+            if neighbours.get(self.change_dir(rightmost_dir, 1), dummy).obstacle \
+                    or not neighbours.get(rightmost_dir, dummy).obstacle:
                 # Discards the forced neighbour candidate
                 neighbours.pop(self.change_dir(rightmost_dir, 1), None)
             else:
@@ -152,11 +148,10 @@ class JPS:
         cost_hv = 1
         cost_di = math.sqrt(2)
 
-        # Constructs the 'vertices' dictionary for a more
-        # convenient access during the self.graph construction.
+        # Constructs the 'vertices' dictionary
         vertices = {k.entity: k for k in self.graph.vertices()}
-        #vertices = vertices.keys()
-        print("nodet:", vertices.keys())
+
+        #print("nodet:", vertices.keys())
 
         # Create the priority queue for open vertices.
         jump_points_pq = PriorityQueue()
@@ -168,12 +163,12 @@ class JPS:
         start_vertex.h = 0
 
         # Adds the start vertex to the priority queue.
-        print(f'Visiting/queueing vertex {start_vertex.entity}')
+        #print(f'Visiting/queueing vertex {start_vertex.entity}')
 
         jump_points_pq.put(start_vertex)
-        print('Prioritized vertices (v, cost, dir):',
-            *((vert.entity, vert.cost, vert.direction) for vert in jump_points_pq.queue),
-            end=2 * '\n')
+        #print('Prioritized vertices (v, cost, dir):',
+            #*((vert.entity, vert.cost, vert.direction) for vert in jump_points_pq.queue),
+            #end=2 * '\n')
 
         # The starting vertex is visited first and has no leading edges.
         visited[start_vertex.entity] = None
@@ -182,7 +177,7 @@ class JPS:
         while not jump_points_pq.empty():
             # Gets the previously calculated jump_point with the lowest cost.
             jpoint_prev = jump_points_pq.get()
-            print(f'Exploring vertex {jpoint_prev.entity}')
+            #print(f'Exploring vertex {jpoint_prev.entity}')
 
             # If goal vertex reached, the algorithm ends.
             if jpoint_prev.entity == goal_vertex:
@@ -219,11 +214,10 @@ class JPS:
                     jpoint.h = tuple(map(lambda x, y: abs(x - y), jpoint.entity, goal_vertex))
                     jpoint.h = abs(jpoint.h[0] - jpoint.h[1]) * cost_hv \
                         + min(jpoint.h[0], jpoint.h[1]) * cost_di
-                    print("jumppipointti#", jpoint.h)
 
                 # Prevents reinsertion to the priority queue. The endpoint distance value will be updated.
                 if jpoint.entity not in visited:
-                    print(f'Visiting/queueing vertex {jpoint.entity}.')
+                    #print(f'Visiting/queueing vertex {jpoint.entity}.')
                     visited[jpoint.entity] = jpoint_prev.entity
                     jump_points_pq.put(jpoint)
 
@@ -236,35 +230,12 @@ class JPS:
                 if not jump_points_pq.empty():
                     jump_points_pq.put(jump_points_pq.get())
 
-            print('Prioritized vertices (v, cost, dir):',
-                *((vert.entity, vert.cost, vert.direction) for vert in jump_points_pq.queue), end=2 * '\n')
+            #print('Prioritized vertices (v, cost, dir):',
+                #*((vert.entity, vert.cost, vert.direction) for vert in jump_points_pq.queue), end=2 * '\n')
             # The vertex is used for update and put aside.
             explored.append(jpoint_prev)
 
-            #self.visited = visited
 
 
-
-
-if __name__ == '__main__':
-    g = JPS(input_matrix)
-
-    #measure path finding time
-    start_time = time.time()
-    # Starts the search.
-    start= (2, 0)
-    end= (7, 10)
-    result = g.jps(start, end)
-    end_time = time.time()
-
-
-    if result is not None:
-        print(f"Path finding execution, JPS: {round((end_time - start_time), 6):.6f} s")
-        print("path:", result["shortestPath"])
-        print("visited:", len(result["visited"]))
-        print("abs dist:", round(result["absoluteDistance"], 1))
-
-    else:
-        print('\nEntity is not found')
 
 

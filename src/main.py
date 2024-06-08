@@ -3,18 +3,19 @@ A graphical user interface to test and visualize the algorithms.
 """
 
 import importlib
-import matplotlib.pyplot as plt
+
 import numpy as np
 from algorithms.dijkstra import Dijkstra
-from algorithms.network import Generate_Network
+from algorithms.JPS import JPS
+
 import time
 
 import tkinter as tk
-#from tkinter import messagebox
+from tkinter import messagebox
 from tkinter import *
 
 
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+#from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 
 class PathFindingApp:
@@ -57,21 +58,21 @@ class PathFindingApp:
         self.run_dijkstra_button = tk.Button(input_frame, text="Run Dijkstra", command=self.run_dijkstra)
         self.run_dijkstra_button.grid(row=5, column=0, sticky = 'WE', padx=4)
 
-        #labels to print  Dijkstra results
+        #create labels
+        self.label0 = tk.Label(root, text="", font=("Helvetica", 16))
+        self.label0.grid(row=9, column=0, columnspan=2, sticky='WE', padx=4)
         self.label1 = tk.Label(root, text="", font=("Helvetica", 16))
-        self.label1.grid(row=6, column=0, columnspan=2, sticky='WE', padx=4)
+        self.label1.grid(row=9, column=0, columnspan=2, sticky='WE', padx=4)
         self.label2 = tk.Label(root, text="", font=("Helvetica", 16))
-        self.label2.grid(row=7, column=0, columnspan=2, sticky='WE', padx=4)
+        self.label2.grid(row=9, column=0, columnspan=2, sticky='WE', padx=4)
         self.label3 = tk.Label(root, text="", font=("Helvetica", 16))
-        self.label3.grid(row=8, column=0, columnspan=2, sticky='WE', padx=4)
-
-        #labels to print JPS results
+        self.label3.grid(row=9, column=0, columnspan=2, sticky='WE', padx=4)
         self.label4 = tk.Label(root, text="", font=("Helvetica", 16))
-        self.label4.grid(row=10, column=0, columnspan=2, sticky='WE', padx=4)
+        self.label4.grid(row=9, column=0, columnspan=2, sticky='WE', padx=4)
         self.label5 = tk.Label(root, text="", font=("Helvetica", 16))
-        self.label5.grid(row=11, column=0, columnspan=2, sticky='WE', padx=4)
+        self.label5.grid(row=9, column=0, columnspan=2, sticky='WE', padx=4)
         self.label6 = tk.Label(root, text="", font=("Helvetica", 16))
-        self.label6.grid(row=12, column=0, columnspan=2, sticky='WE', padx=4)
+        self.label6.grid(row=9, column=0, columnspan=2, sticky='WE', padx=4)
 
         #map visualization configuration
         self.canvas = tk.Canvas(root, width=500, height=500, bg="white")
@@ -107,7 +108,6 @@ class PathFindingApp:
                     self.draw_map()
 
                 self.start_coord = self.coord
-                self.prev_start_coord = self.start_coord #save as previous coordinates
                 self.canvas.create_rectangle(x0, y0, x1, y1, fill="green")
                 print("start: ", self.start_coord)
                 self.selecting_start = False
@@ -120,7 +120,6 @@ class PathFindingApp:
                     return
 
                 self.end_coord = self.coord
-                self.prev_end_coord = self.end_coord #save as previous coordinates
                 self.canvas.create_rectangle(x0, y0, x1, y1, fill="blue")
                 print("end: ", self.end_coord)
                 self.selecting_end = False
@@ -130,6 +129,18 @@ class PathFindingApp:
 
 
     def load_map(self):
+        #empty the labels
+        self.label1.config(text="")
+        self.label2.config(text="")
+        self.label3.config(text="")
+        self.label4.config(text="")
+        self.label5.config(text="")
+        self.label6.config(text="")
+
+        #empty the previous input
+        self.start_coord = None
+        self.end_coord = None
+
         map_name = self.map_options.get()
         # Load a map here
         try:
@@ -141,12 +152,11 @@ class PathFindingApp:
             self.draw_map()
         except ImportError as e:
             print("noi")
-            #messagebox.showerror("Error", f"Failed to load map: {e}")
+            messagebox.showerror("Error", f"Failed to load map: {e}")
 
     def draw_map(self):
         if self.map is None:
             #messagebox.showerror("Error")
-            print("nooi")
             return
 
         self.canvas.delete("all")
@@ -167,7 +177,7 @@ class PathFindingApp:
                 color = "black" if self.map[i][j] == 1 else "white"
                 self.canvas.create_rectangle(x0, y0, x1, y1, fill=color)
 
-    def draw_route(self, route):
+    def draw_route(self, route, color):
 
         for node in route:
             if node != self.start_coord and node != self.end_coord:
@@ -175,13 +185,49 @@ class PathFindingApp:
                 y0 = node[0] * self.cell_size
                 x1 = x0 + self.cell_size
                 y1 = y0 + self.cell_size
-                self.canvas.create_rectangle(x0, y0, x1, y1, fill="yellow")
+                self.canvas.create_rectangle(x0, y0, x1, y1, fill=color)
 
 
     def run_jps(self):
-        pass
+
+        #labels to print JPS results
+        self.label4 = tk.Label(root, text="", font=("Helvetica", 16))
+        self.label4.grid(row=10, column=0, columnspan=2, sticky='WE', padx=4)
+        self.label5 = tk.Label(root, text="", font=("Helvetica", 16))
+        self.label5.grid(row=11, column=0, columnspan=2, sticky='WE', padx=4)
+        self.label6 = tk.Label(root, text="", font=("Helvetica", 16))
+        self.label6.grid(row=12, column=0, columnspan=2, sticky='WE', padx=4)
+
+        jps = JPS(self.map)
+        start = self.start_coord
+        end = self.end_coord
+
+        #measure path finding time
+        start_time = time.time()
+        result = jps.jps(start, end)
+        end_time = time.time()
+
+        if result:
+            shortest_path = result["shortestPath"]
+            absolute_distance = round(result["absoluteDistance"], 1)
+            visited = len(result["visited"])
+            self.label4.config(text=f"Path finding execution, JPS: {round((end_time - start_time), 6):.6f} s")
+            self.label5.config(text=f"Absolute distance: {absolute_distance}")
+            self.label6.config(text=f"Number of visited nodes: {visited}")
+            self.draw_route(shortest_path, color="lightpink")
+        else:
+            self.label4.config(text=f"No path found with JPS.")
+            print("No path found.")
 
     def run_dijkstra(self):
+
+        #labels to print  Dijkstra results
+        self.label1 = tk.Label(root, text="", font=("Helvetica", 16))
+        self.label1.grid(row=6, column=0, columnspan=2, sticky='WE', padx=4)
+        self.label2 = tk.Label(root, text="", font=("Helvetica", 16))
+        self.label2.grid(row=7, column=0, columnspan=2, sticky='WE', padx=4)
+        self.label3 = tk.Label(root, text="", font=("Helvetica", 16))
+        self.label3.grid(row=8, column=0, columnspan=2, sticky='WE', padx=4)
         dijkstra = Dijkstra(self.map)
         start = self.start_coord
         end = self.end_coord
@@ -192,23 +238,16 @@ class PathFindingApp:
         end_time = time.time()
 
         if result:
-            #print(f"Path finding execution, Dijkstra: {round((end_time - start_time), 6):.6f} s")
             shortest_path = result["shortestPath"]
-            absolute_distance = result["absoluteDistance"]
+            absolute_distance = round(result["absoluteDistance"], 1)
             visited = len(result["visited"])
-            #print("Shortest path:", shortest_path)
-            #print("Absolute Distance:", absolute_distance)
-            #print("visited: ", visited)
             self.label1.config(text=f"Path finding execution, Dijkstra: {round((end_time - start_time), 6):.6f} s")
             self.label2.config(text=f"Absolute distance: {absolute_distance}")
             self.label3.config(text=f"Number of visited nodes: {visited}")
-            self.draw_route(shortest_path)
+            self.draw_route(shortest_path, color="deeppink")
         else:
-            self.label1.config(text=f"No path found.")
+            self.label1.config(text=f"No path found with Dijkstra.")
             print("No path found.")
-
-
-
 
 
 

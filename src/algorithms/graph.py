@@ -7,23 +7,17 @@ import math
 class Graph:
     def __init__(self, input_matrix, directed=False):
         self._outgoing = {}
-        #self._incoming = {} if directed else self._outgoing
         self._incoming = self._outgoing
         self.matrix = input_matrix
 
-    #def is_directed(self):
-        #return self._incoming is not self._outgoing
-
     def adjacent_edges(self, vertex, outgoing=True):
-        adj_edges = self._outgoing# if outgoing else self._incoming
+        adj_edges = self._outgoing
         for edge in adj_edges[vertex].values():
             yield edge #iterate over each of the edges for the vertex
 
     def add_vertex(self, entity=None, h=None, cost=None):
         vertex = self.Vertex(entity, h, cost)
         self._outgoing[vertex] = {}
-        #if self.is_directed():
-            #self._incoming[vertex] = {}
         return vertex
 
 
@@ -177,7 +171,3 @@ class Graph:
         def __hash__(self):
             return hash((self._origin, self._destination))
 
-
-"""g=Graph(input_matrix)
-g.create_graph()
-g.print_graph()"""
