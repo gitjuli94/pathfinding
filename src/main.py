@@ -225,6 +225,11 @@ class PathFindingApp:
         self.label2.grid(row=7, column=0, columnspan=2, sticky='WE', padx=4)
         self.label3 = tk.Label(root, text="", font=("Helvetica", 16))
         self.label3.grid(row=8, column=0, columnspan=2, sticky='WE', padx=4)
+        self.label_empty = tk.Label(root, text="", font=("Helvetica", 16))
+        self.label_empty.grid(row=13, column=0, columnspan=2, sticky='WE', padx=20)
+        self.label_n = tk.Label(root, text="", font=("Helvetica", 16))
+        self.label_n.grid(row=14, column=0, columnspan=2, sticky='WE', padx=20)
+
         dijkstra = Dijkstra(self.map)
         start = self.start_coord
         end = self.end_coord
@@ -235,9 +240,11 @@ class PathFindingApp:
         end_time = time.time()
 
         if result:
+            routes = result["foundRoutes"]
             shortest_path = result["shortestPath"]
             absolute_distance = round(result["absoluteDistance"], 1)
             visited = len(result["visited"])
+            self.label_n.config(text=f"Number of different shortest routes: {routes}")
             self.label1.config(text=f"Path finding execution, Dijkstra: {round((end_time - start_time), 6):.6f} s")
             self.label2.config(text=f"Absolute distance: {absolute_distance}")
             self.label3.config(text=f"Number of visited nodes: {visited}")
