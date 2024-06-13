@@ -21,8 +21,8 @@ class JPS:
     def __init__(self, input_matrix):
         # Initializes an empty self.graph (object).
         # Creating a self.graph from the input matrix
-        self.graph = Graph(input_matrix, directed=False)
-        self.graph.create_graph()
+        self.graph = Graph(input_matrix)
+        #self.graph.create_graph()
         #print(self.graph.vertices.entity)
 
 
@@ -114,6 +114,7 @@ class JPS:
 
 
     def jump(self, vertex, direction, cost_so_far, goal_vertex):
+
         jump_point, cost = self.step(vertex, direction, cost_so_far)
 
         if jump_point is None:

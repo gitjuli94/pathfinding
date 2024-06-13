@@ -38,11 +38,15 @@ class Dijkstra:
             node_a = heapq.heappop(queue)[1]
             if node_a == end_node:
                 routes.extend(self.reconstruct_path(came_from, end_node)) # Add all routes to a list
+
                 #print("n of routes: ", len(routes))
                 #print("routes: ", routes)
+                #print("from: ", came_from)
+                #print("route1: ", sorted(routes)[0])
 
                 return {
-                    "shortestPath": routes[0], # for visualizing the first found path
+                    "cameFrom": came_from, #return dictionary of predecessor nodes
+                    "shortestPath": sorted(routes)[0], # for visualizing the first found path
                     "foundRoutes": len(routes), # how many shortest paths found
                     "visited": visited,
                     #using round to handle floating point precision issues
@@ -75,7 +79,7 @@ class Dijkstra:
         for prev in came_from[current]: # recursive function to find all the paths
             for path in self.reconstruct_path(came_from, prev):
                 paths.append(path + [current])
-        #print(paths)
+        #print("paths: ", paths)
         return paths
         """
         #for a single path

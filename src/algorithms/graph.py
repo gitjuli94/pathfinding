@@ -5,17 +5,20 @@ Create a network of nodes and edges for the JPS algorithm using a map (matrix) w
 import math
 
 class Graph:
-    def __init__(self, input_matrix, directed=False):
+    def __init__(self, input_matrix):
         self._outgoing = {}
         self._incoming = self._outgoing
         self.matrix = input_matrix
+        self.graph = self.create_graph()
 
-    def adjacent_edges(self, vertex, outgoing=True):
+    def adjacent_edges(self, vertex):
+        # a method to iterate over the adjacent edges of a vertex
         adj_edges = self._outgoing
         for edge in adj_edges[vertex].values():
             yield edge #iterate over each of the edges for the vertex
 
     def add_vertex(self, entity=None, h=None, cost=None):
+        # a method to add a vertex in the graph
         vertex = self.Vertex(entity, h, cost)
         self._outgoing[vertex] = {}
         return vertex
@@ -56,20 +59,23 @@ class Graph:
                     current_vertex = vertices[(i, j)]
                     #four directions added. the opposite directions (rotation with 180deg)
                     #are handled within JPS.change_dir (by adding 4 in the direction)
-                    if j < n - 1:  # horizontal
+                    if j < n - 1 and  not vertices[(i, j + 1)].obstacle:  # horizontal
                         self.add_edge(current_vertex, vertices[(i, j + 1)], weight=cost_hv, direction=0)
 
-                    if i < m - 1:  # vertical
+                    if i < m - 1 and not vertices[(i + 1, j)].obstacle:  # vertical
                         self.add_edge(current_vertex, vertices[(i + 1, j)], weight=cost_hv, direction=6)
 
                     if i < m - 1 and j < n - 1:  # left Diagonal
-                        self.add_edge(current_vertex, vertices[(i + 1, j + 1)], weight=cost_di, direction=7)
+                        if not vertices[(i + 1, j + 1)].obstacle:
+                            self.add_edge(current_vertex, vertices[(i + 1, j + 1)], weight=cost_di, direction=7)
 
                     if i < m - 1 and j > 0 and self.matrix[i + 1][j - 1] == 0:  # right Diagonal
-                        self.add_edge(current_vertex, vertices[(i + 1, j - 1)], weight=cost_di, direction=5)
+                        if not vertices[(i + 1, j - 1)].obstacle:
+                            self.add_edge(current_vertex, vertices[(i + 1, j - 1)], weight=cost_di, direction=5)
 
 
     def print_graph(self):
+        # a method to print the graph
         for vertex in self._outgoing:
             print(f"Vertex {vertex.entity}:")
             for edge in self.adjacent_edges(vertex):
@@ -127,7 +133,11 @@ class Graph:
             self._direction = direction
 
         def __hash__(self):
+            return hash(self._entity)
             return hash(id(self))
+
+        def __eq__(self, other):
+            return isinstance(other, Graph.Vertex) and self._entity == other._entity
 
         def __lt__(self, other):
             if self.cost is None:
@@ -170,4 +180,5 @@ class Graph:
 
         def __hash__(self):
             return hash((self._origin, self._destination))
+
 

@@ -30,3 +30,12 @@ class Generate_Network:
             if 0 <= nx < self.rows and 0 <= ny < self.cols and self.matrix[nx][ny] == 0:
                 weight = 1 if abs(dx) + abs(dy) == 1 else 2**0.5
                 self.graph[(x, y)].append(((nx, ny), weight))
+
+matrix = [
+            [0, 1, 0],
+            [1, 0, 1],
+            [0, 1, 0]
+        ]
+
+#result = Generate_Network(matrix)
+#print(result.graph)

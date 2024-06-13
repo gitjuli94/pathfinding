@@ -56,6 +56,8 @@ class PathFindingApp:
         self.run_dijkstra_button.grid(row=5, column=0, sticky = 'WE', padx=4)
 
         #create labels
+        self.label_n = tk.Label(root, text="", font=("Helvetica", 16))
+        self.label_n.grid(row=14, column=0, columnspan=2, sticky='WE', padx=20)
         self.label0 = tk.Label(root, text="", font=("Helvetica", 16))
         self.label0.grid(row=9, column=0, columnspan=2, sticky='WE', padx=4)
         self.label1 = tk.Label(root, text="", font=("Helvetica", 16))
@@ -127,6 +129,7 @@ class PathFindingApp:
 
     def load_map(self):
         #empty the labels
+        self.label_n.config(text="")
         self.label1.config(text="")
         self.label2.config(text="")
         self.label3.config(text="")
@@ -227,8 +230,7 @@ class PathFindingApp:
         self.label3.grid(row=8, column=0, columnspan=2, sticky='WE', padx=4)
         self.label_empty = tk.Label(root, text="", font=("Helvetica", 16))
         self.label_empty.grid(row=13, column=0, columnspan=2, sticky='WE', padx=20)
-        self.label_n = tk.Label(root, text="", font=("Helvetica", 16))
-        self.label_n.grid(row=14, column=0, columnspan=2, sticky='WE', padx=20)
+
 
         dijkstra = Dijkstra(self.map)
         start = self.start_coord
