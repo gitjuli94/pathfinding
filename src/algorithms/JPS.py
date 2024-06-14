@@ -129,7 +129,6 @@ class JPS:
             return None, None
 
         if jump_point.coords == goal_vertex: # if a vertex is the goal:
-            #self.jump_points.append(jump_point.coords) # save the jump point
             return jump_point, cost
 
         if self.prune(jump_point, direction).forced: # check if there are forced neighbors
@@ -192,7 +191,7 @@ class JPS:
 
             # Gets the previously calculated jump_point with the lowest cost.
             jpoint_prev = jump_points_pq.get()
-            print(jpoint_prev.coords)
+
 
             #print(f'Exploring vertex {jpoint_prev.coords}')
 
