@@ -55,3 +55,8 @@ Run the algorithms in the GUI using the buttons explained below. Also, pay atten
 * Load Map Button: Load the selected map for visualization.
 * Run JPS Button: Run the Jump Point Search algorithm and visualize the path.
 * Run Dijkstra Button: Run the Dijkstra algorithm and visualize the path.
+
+![image](https://github.com/gitjuli94/pathfinding/assets/149376454/d0eabff3-da24-452f-b908-927fd9467f7a)
+
+![image](https://github.com/gitjuli94/pathfinding/assets/149376454/2ebbd07b-e50b-4e2c-b36e-30d4b3a1e134)
+
