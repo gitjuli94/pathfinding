@@ -11,6 +11,7 @@ from collections import namedtuple
 
 
 # A dummy object with the obstable attribute
+# Used as a placeholder for missing neighbors
 class DummyObject:
     def __init__(self):
         self.obstacle = True
@@ -23,7 +24,7 @@ class JPS:
         # Creating a self.graph from the input matrix
         self.graph = Graph(input_matrix)
         #self.graph.create_graph()
-        #print(self.graph.vertices.entity)
+        #print(self.graph.vertices.coords)
 
 
     def prune(self, vertex, direction=None):
@@ -33,57 +34,61 @@ class JPS:
         if direction is None:
             direction = vertex.direction
 
-        # Enables us to return both the neighbouring vertices and the
+        # enables us to return both the neighbouring vertices and the
         # indicator of forced neighbours existence
         pruned = namedtuple('pruned', 'vertices forced')
 
-        # ...right here :-) We use it to ensure availability of the property
-        # when the None object gets returned from the 'neighbours' dictionary.
+        # if a direction is not present in the neighbors dictionary, return dummy,
+        # an instance set as an obstacle
         dummy = DummyObject()
-        #o.obstacle = lambda: True
 
-        # Collects all the surrounding vertices in a dictionary and
+        # collects all the surrounding vertices in a dictionary and
         # marks them with the search direction
         for edge in self.graph.adjacent_edges(vertex):
             neighbours[edge.direction] = edge.opposite(vertex)
 
-        # Applies exclusively to the non-starting vertices
+        # pruning to the non-starting vertices
         if direction is not None:
-            # Determines if the movement direction is horizontal/vertical (0) or diagonal (1)
+            # determines if the movement direction is diagonal
             is_diagonal = direction % 2
 
+            # forced neighbors: the presence of obstacles can cause the path
+            # to be rerouted around the obstacle
+
+            # calculate directions for forced neighbors
             leftmost_dir = self.change_dir(direction, 2 + is_diagonal)
             rightmost_dir = self.change_dir(direction, -2 - is_diagonal)
 
-            # Parent is never a neighbour candidate
+            # removes the parent direction from neighbors
             neighbours.pop(self.change_dir(direction, 4), None)
 
-            # Check natural neighbours (directly reachable nodes) obstacles
+            # check natural neighbours (directly reachable nodes) obstacles
             for idx in range(-is_diagonal, is_diagonal + 1):
                 if neighbours.get(self.change_dir(direction, idx), dummy).obstacle:
                     neighbours.pop(self.change_dir(direction, idx), None)
 
-            # Check forced neighbours (left)
+            # check for forced neighbors on the left and right sides relative to the
+            # current movement direction
+
+            # check forced neighbours (left)
             # (forced neighbors are those that must be considered due to the presence of obstacles)
-            if neighbours.get(self.change_dir(leftmost_dir, -1), dummy).obstacle \
-                    or not neighbours.get(leftmost_dir, dummy).obstacle:
-                # Discards the forced neighbour candidate
-                neighbours.pop(self.change_dir(leftmost_dir, -1), None)
+            if neighbours.get(self.change_dir(leftmost_dir, -1), dummy).obstacle or not neighbours.get(leftmost_dir, dummy).obstacle:
+            #  ^ check if there is an obstacle at one step left                         ^ check if the leftmost direction itself does not have an obstacle
+                neighbours.pop(self.change_dir(leftmost_dir, -1), None) # discards the forced neighbour candidate
             else:
                 forced_neighbours_exist = True
-            neighbours.pop(leftmost_dir, None)
+            neighbours.pop(leftmost_dir, None) # remove the leftmost direction itself from neighbors as it is not a valid candidate
 
-            # Check forced neighbours (right)
+            # check forced neighbours (right)
             # (forced neighbors are those that must be considered due to the presence of obstacles)
-            if neighbours.get(self.change_dir(rightmost_dir, 1), dummy).obstacle \
-                    or not neighbours.get(rightmost_dir, dummy).obstacle:
-                # Discards the forced neighbour candidate
-                neighbours.pop(self.change_dir(rightmost_dir, 1), None)
+            if neighbours.get(self.change_dir(rightmost_dir, 1), dummy).obstacle or not neighbours.get(rightmost_dir, dummy).obstacle:
+            #  ^ check if there is an obstacle at one step right                         ^ check if the rightmost direction itself does not have an obstacle
+                neighbours.pop(self.change_dir(rightmost_dir, 1), None) # discards the forced neighbour candidate
             else:
                 forced_neighbours_exist = True
             neighbours.pop(rightmost_dir, None)
 
-            # Back vertices are never neighbour candidates
+            # remove neighbors that would lead backwards
             neighbours.pop(self.change_dir(direction, 4 + 1), None)
             neighbours.pop(self.change_dir(direction, 4 - 1), None)
 
@@ -91,72 +96,80 @@ class JPS:
 
 
     def step(self, vertex, direction, cost_so_far):
-        # Defines a fail-safe result.
-        next_vertex = None
+        # determine the next vertex to move to from a given vertex in a specified direction
+
+        next_vertex = None # initially there is no determined next vertex
         cost = 0
 
-        # Searches among the available edges and follows the right one.
+        # searches among the available edges
         for edge in self.graph.adjacent_edges(vertex):
             if edge.direction == direction and not edge.opposite(vertex).obstacle:
+                # ensure that the edge aligns with the desired direction of movement
+                # and check that the opposite vertex of the edge is not an obstacle
                 next_vertex = edge.opposite(vertex)
                 cost = cost_so_far + edge.weight
-                break
+                break # when a suitable edge is found
             else:
                 continue
 
-        # If the edge is not found, the equivalent of "nothing" is returned.
         return next_vertex, cost
 
-
-    # Changes the direction within the defined eight directions
     def change_dir(self, direction, amount):
+        # changes the direction within the defined eight directions
         return (direction + amount) % 8
 
 
     def jump(self, vertex, direction, cost_so_far, goal_vertex):
+        # looks for jump points in the grid
 
+        # attempt to take a step from the current vertex in the specified direction
         jump_point, cost = self.step(vertex, direction, cost_so_far)
 
-        if jump_point is None:
+        if jump_point is None: # if no jump point is found in the specified direction
             return None, None
 
-        # If a vertex is the goal vertex:
-        if jump_point.entity == goal_vertex:
+        if jump_point.coords == goal_vertex: # if a vertex is the goal:
+            #self.jump_points.append(jump_point.coords) # save the jump point
             return jump_point, cost
 
-        # Checks if forced neighbours exist
-        if self.prune(jump_point, direction).forced:
+        if self.prune(jump_point, direction).forced: # check if there are forced neighbors
+            #self.jump_points.append(jump_point.coords) # save the jump point
             return jump_point, cost
 
-        # Activates if the direction is diagonal.
-        if direction % 2:
-            for direction_l_r in (self.change_dir(direction, 1), self.change_dir(direction, -1)):
-                # Tests if the next jump point exists (its cost is irrelevant in the context of the check alone).
-                next_jump_point, _ = self.jump(jump_point, direction_l_r, 0, goal_vertex)
+        if direction % 2: # if the direction is diagonal
+            for direction_l_r in (self.change_dir(direction, 1), self.change_dir(direction, -1)): # iterate over diagonal movement variations
+                next_jump_point, _ = self.jump(jump_point, direction_l_r, 0, goal_vertex) # recursive exploration, aims to find additional jump points in diagonal directions
                 if next_jump_point is not None:
+                    #self.jump_points.append(jump_point.coords) # save the jump point
                     return jump_point, cost
 
-        # Proceed in the same direction.
-        jump_point, cost = self.jump(jump_point, direction, cost, goal_vertex)
+        jump_point, cost = self.jump(jump_point, direction, cost, goal_vertex) # continue in the same direction
+
         return jump_point, cost
 
     def jps(self, start_vertex, goal_vertex):
-        # Initialize lists for node lists
-        explored = []
-        visited = {}
 
-        # Costs of directions
+        # list of jump points:
+        self.jump_points = []
+
+        # data structures for nodes
+        explored = [] # for vertices that have been fully explored and dequed from the priority queue
+        visited = {} # the predecessors of each vertex in the path, not necessarily fully explored/processed
+
+        # costs of directions
         cost_hv = 1
         cost_di = math.sqrt(2)
 
-        # Constructs the 'vertices' dictionary
-        vertices = {k.entity: k for k in self.graph.vertices()}
+        # construct the 'vertices' dictionary
+        vertices = {k.coords: k for k in self.graph.vertices()}
 
         #print("nodet:", vertices.keys())
 
-        # Create the priority queue for open vertices.
+        # create the priority queue for open vertices
         jump_points_pq = PriorityQueue()
+        #print(vertices)
         if start_vertex not in vertices or goal_vertex not in vertices:
+            print("Check that start and end nodes are correctly specified.")
             return None
         start_vertex = vertices[start_vertex]
         start_vertex.cost = 0
@@ -164,41 +177,47 @@ class JPS:
         start_vertex.h = 0
 
         # Adds the start vertex to the priority queue.
-        #print(f'Visiting/queueing vertex {start_vertex.entity}')
+        #print(f'Visiting/queueing vertex {start_vertex.coords}')
 
         jump_points_pq.put(start_vertex)
         #print('Prioritized vertices (v, cost, dir):',
-            #*((vert.entity, vert.cost, vert.direction) for vert in jump_points_pq.queue),
+            #*((vert.coords, vert.cost, vert.direction) for vert in jump_points_pq.queue),
             #end=2 * '\n')
 
         # The starting vertex is visited first and has no leading edges.
-        visited[start_vertex.entity] = None
+        visited[start_vertex.coords] = None
 
         # Loops until the priority list gets empty.
         while not jump_points_pq.empty():
+
             # Gets the previously calculated jump_point with the lowest cost.
             jpoint_prev = jump_points_pq.get()
-            #print(f'Exploring vertex {jpoint_prev.entity}')
+            print(jpoint_prev.coords)
+
+            #print(f'Exploring vertex {jpoint_prev.coords}')
 
             # If goal vertex reached, the algorithm ends.
-            if jpoint_prev.entity == goal_vertex:
+            if jpoint_prev.coords == goal_vertex:
                 distance = jpoint_prev.cost
-                # The search path ends with the found vertex (entity).
+                # The search path ends with the found vertex (coords).
                 # Initializes the search path and a dictionary of visited vertices.
                 path = []
-                path_vertex = jpoint_prev.entity
+                path_vertex = jpoint_prev.coords
                 # Constructs the rest of the search path
                 while path_vertex is not None:
-                    # The entity is added to the 'path'.
+                    # The coords is added to the 'path'.
                     path.append(path_vertex)
                     path_vertex = visited[path_vertex]
 
                 path.reverse()
 
+                #jpoints_final = [jpoint for jpoint in self.jump_points if jpoint.coords in path]
+                print("self.jpoints: ", self.jump_points)
                 return {
                     "shortestPath": path,
-                    "visited": explored,
-                    "absoluteDistance": distance
+                    "explored": explored,
+                    "absoluteDistance": round(distance, 1),
+                    #"jpoints": self.jump_points
                 }
 
             # Finds the vertex neighbours (natural and forced).
@@ -212,14 +231,14 @@ class JPS:
 
                 # Calculates the jump point's heuristic value.
                 if jpoint.h is None:
-                    jpoint.h = tuple(map(lambda x, y: abs(x - y), jpoint.entity, goal_vertex))
+                    jpoint.h = tuple(map(lambda x, y: abs(x - y), jpoint.coords, goal_vertex))
                     jpoint.h = abs(jpoint.h[0] - jpoint.h[1]) * cost_hv \
                         + min(jpoint.h[0], jpoint.h[1]) * cost_di
 
                 # Prevents reinsertion to the priority queue. The endpoint distance value will be updated.
-                if jpoint.entity not in visited:
-                    #print(f'Visiting/queueing vertex {jpoint.entity}.')
-                    visited[jpoint.entity] = jpoint_prev.entity
+                if jpoint.coords not in visited:
+                    #print(f'Visiting/queueing vertex {jpoint.coords}.')
+                    visited[jpoint.coords] = jpoint_prev.coords
                     jump_points_pq.put(jpoint)
 
                 if jpoint.cost is None or jpoint.cost - jpoint.h > cost - jpoint_prev.h:
@@ -232,9 +251,11 @@ class JPS:
                     jump_points_pq.put(jump_points_pq.get())
 
             #print('Prioritized vertices (v, cost, dir):',
-                #*((vert.entity, vert.cost, vert.direction) for vert in jump_points_pq.queue), end=2 * '\n')
+                #*((vert.coords, vert.cost, vert.direction) for vert in jump_points_pq.queue), end=2 * '\n')
             # The vertex is used for update and put aside.
             explored.append(jpoint_prev)
+
+        return False # returns false if no path found
 
 
 

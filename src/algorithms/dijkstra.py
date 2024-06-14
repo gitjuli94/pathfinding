@@ -47,7 +47,7 @@ class Dijkstra:
                 return {
                     "cameFrom": came_from, #return dictionary of predecessor nodes
                     "shortestPath": sorted(routes)[0], # for visualizing the first found path
-                    "foundRoutes": len(routes), # how many shortest paths found
+                    "Routes": routes, # list of shortest paths found
                     "visited": visited,
                     #using round to handle floating point precision issues
                     #"absoluteDistance": round(distances[end_node] + 1e-9, 1) -> unnecessary?

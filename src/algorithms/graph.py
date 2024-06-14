@@ -17,9 +17,9 @@ class Graph:
         for edge in adj_edges[vertex].values():
             yield edge #iterate over each of the edges for the vertex
 
-    def add_vertex(self, entity=None, h=None, cost=None):
+    def add_vertex(self, coords=None, h=None, cost=None):
         # a method to add a vertex in the graph
-        vertex = self.Vertex(entity, h, cost)
+        vertex = self.Vertex(coords, h, cost)
         self._outgoing[vertex] = {}
         return vertex
 
@@ -41,19 +41,22 @@ class Graph:
         return result
 
     def create_graph(self, cost_hv=1, cost_di=math.sqrt(2)):
-        m, n = len(self.matrix), len(self.matrix[0])
+        # creates a graph for nxm matrix
+        m = len(self.matrix)
         vertices = {}
 
         # Add vertices
         for i in range(m):
+            n = len(self.matrix[i])
             for j in range(n):
                 vertex = self.add_vertex((i, j))
                 vertex.obstacle = self.matrix[i][j] == 1  # Mark as obstacle if the matrix entry is 1
                 vertices[(i, j)] = vertex
-                #print(f"Added vertex: {vertex.entity}")
+                #print(f"Added vertex: {vertex.coords}")
 
         # Add edges in form add_edge(origin, destination, weight, direction)
         for i in range(m):  # rows
+            n = len(self.matrix[i])
             for j in range(n):  # columns
                 if not vertices[(i, j)].obstacle:  # Only consider non-obstacle vertices
                     current_vertex = vertices[(i, j)]
@@ -77,28 +80,28 @@ class Graph:
     def print_graph(self):
         # a method to print the graph
         for vertex in self._outgoing:
-            print(f"Vertex {vertex.entity}:")
+            print(f"Vertex {vertex.coords}:")
             for edge in self.adjacent_edges(vertex):
                 origin, destination = edge.endpoints()
-                print(f"  connects to {destination.entity} with weight {edge.weight} and direction {edge.direction}")
+                print(f"  connects to {destination.coords} with weight {edge.weight} and direction {edge.direction}")
 
     class Vertex:
         __slots__ = '_entity', '_h', '_cost', '_obstacle', '_direction'
 
-        def __init__(self, entity, h=None, cost=None):
-            self.entity = entity
+        def __init__(self, coords, h=None, cost=None):
+            self.coords = coords
             self.h = h
             self.cost = cost
             self.obstacle = False
             self.direction = None
 
         @property
-        def entity(self):
+        def coords(self):
             return self._entity
 
-        @entity.setter
-        def entity(self, entity):
-            self._entity = entity
+        @coords.setter
+        def coords(self, coords):
+            self._entity = coords
 
         @property
         def h(self):

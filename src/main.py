@@ -56,8 +56,10 @@ class PathFindingApp:
         self.run_dijkstra_button.grid(row=5, column=0, sticky = 'WE', padx=4)
 
         #create labels
+        self.label_jpoints = tk.Label(root, text="", font=("Helvetica", 16))
+        self.label_jpoints.grid(row=14, column=0, columnspan=2, sticky='WE', padx=20)
         self.label_n = tk.Label(root, text="", font=("Helvetica", 16))
-        self.label_n.grid(row=14, column=0, columnspan=2, sticky='WE', padx=20)
+        self.label_n.grid(row=15, column=0, columnspan=2, sticky='WE', padx=20)
         self.label0 = tk.Label(root, text="", font=("Helvetica", 16))
         self.label0.grid(row=9, column=0, columnspan=2, sticky='WE', padx=4)
         self.label1 = tk.Label(root, text="", font=("Helvetica", 16))
@@ -210,11 +212,13 @@ class PathFindingApp:
         if result:
             shortest_path = result["shortestPath"]
             absolute_distance = round(result["absoluteDistance"], 1)
-            visited = len(result["visited"])
+            explored = len(result["explored"])
             self.label4.config(text=f"Path finding execution, JPS: {round((end_time - start_time), 6):.6f} s")
             self.label5.config(text=f"Absolute distance: {absolute_distance}")
-            self.label6.config(text=f"Number of visited nodes: {visited}")
+            self.label6.config(text=f"Number of visited nodes: {explored}")
+            self.label_jpoints.config(text=f"Number of jump points: {len(result["jpoints"])}")
             self.draw_route(shortest_path, color="lightpink")
+            self.draw_route(result["jpoints"], color="red")
         else:
             self.label4.config(text=f"No path found with JPS.")
             print("No path found.")
@@ -242,7 +246,7 @@ class PathFindingApp:
         end_time = time.time()
 
         if result:
-            routes = result["foundRoutes"]
+            routes = len(result["Routes"])
             shortest_path = result["shortestPath"]
             absolute_distance = round(result["absoluteDistance"], 1)
             visited = len(result["visited"])
