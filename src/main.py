@@ -42,7 +42,7 @@ class PathFindingApp:
         self.map_options = tk.StringVar()
         self.map_options.set("random_city")  # Default map option
 
-        map_menu = tk.OptionMenu(input_frame, self.map_options, "random_city", "simple1", "simple2")
+        map_menu = tk.OptionMenu(input_frame, self.map_options, "random_city", "simple1", "simple2", "Milan")
         #map_menu = tk.OptionMenu(input_frame, self.map_options, "Milan", "Shanghai", "NewYork")#final options
         map_menu.grid(row=2, column=0, sticky = 'WE', padx=4)
 
@@ -210,14 +210,15 @@ class PathFindingApp:
         end_time = time.time()
 
         if result:
-            shortest_path = result["shortestPath"]
+          #  shortest_path = result["shortestPath"]
             absolute_distance = round(result["absoluteDistance"], 1)
             explored = len(result["explored"])
-            self.label4.config(text=f"Path finding execution, JPS: {round((end_time - start_time), 6):.6f} s")
+            self.label4.config(text=f"{end_time - start_time}")
+           # self.label4.config(text=f"Path finding execution, JPS: {round((end_time - start_time), 6):.6f} s")
             self.label5.config(text=f"Absolute distance: {absolute_distance}")
             self.label6.config(text=f"Number of visited nodes: {explored}")
             #self.label_jpoints.config(text=f"Number of jump points: {len(result["jpoints"])}")
-            self.draw_route(shortest_path, color="lightpink")
+         #   self.draw_route(shortest_path, color="lightpink")
             #self.draw_route(result["jpoints"], color="red")
         else:
             self.label4.config(text=f"No path found with JPS.")

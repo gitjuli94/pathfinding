@@ -1,5 +1,5 @@
 """
-Unit testing for graph algorithm which is used for network creation for the JPS algorithm.
+Unit testing for JPS algorithm.
 """
 import unittest
 import sys

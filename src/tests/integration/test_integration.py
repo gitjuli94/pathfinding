@@ -49,12 +49,13 @@ class TestIntegration(unittest.TestCase):
         end = (1,5)
         # route: 0,2 -> 0,4 -> 1,5
         expected_jpoints = [(0,2), (0,4)]
+        print("expected:", expected_jpoints)
         jps = JPS(test_matrix)
         result = jps.jps(start, end)
-        #print(result["jpoints"])
-       # print("explored:", len(result_JPS["explored"]))
-        print("shortestPath", result["shortestPath"])
-        #print("jpoints", len(result_JPS["jpoints"]))
+        print("explored:", result["explored"])
+      #  print("shortestPath", result["shortestPath"])
+        print("absoluteDistance", result["absoluteDistance"])
+        print("jpoints", result["jpoints"])
 
 
 
