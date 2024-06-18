@@ -139,7 +139,7 @@ class JPS:
             for direction_l_r in (self.change_dir(direction, 1), self.change_dir(direction, -1)): # iterate over diagonal movement variations
                 next_jump_point, _ = self.jump(jump_point, direction_l_r, 0, goal_vertex) # recursive exploration, aims to find additional jump points in diagonal directions
                 if next_jump_point is not None:
-                    #self.jump_points.append(jump_point.coords) # save the jump point
+                    self.jump_points.append(jump_point.coords) # save the jump point
                     return jump_point, cost
 
         jump_point, cost = self.jump(jump_point, direction, cost, goal_vertex) # continue in the same direction
@@ -179,9 +179,9 @@ class JPS:
         #print(f'Visiting/queueing vertex {start_vertex.coords}')
 
         jump_points_pq.put(start_vertex)
-        #print('Prioritized vertices (v, cost, dir):',
-            #*((vert.coords, vert.cost, vert.direction) for vert in jump_points_pq.queue),
-            #end=2 * '\n')
+        print('Prioritized vertices (v, cost, dir):',
+            *((vert.coords, vert.cost, vert.direction) for vert in jump_points_pq.queue),
+            end=2 * '\n')
 
         # The starting vertex is visited first and has no leading edges.
         visited[start_vertex.coords] = None
@@ -249,8 +249,8 @@ class JPS:
                 if not jump_points_pq.empty():
                     jump_points_pq.put(jump_points_pq.get())
 
-            #print('Prioritized vertices (v, cost, dir):',
-                #*((vert.coords, vert.cost, vert.direction) for vert in jump_points_pq.queue), end=2 * '\n')
+            print('Prioritized vertices (v, cost, dir):',
+                *((vert.coords, vert.cost, vert.direction) for vert in jump_points_pq.queue), end=2 * '\n')
             # The vertex is used for update and put aside.
             explored.append(jpoint_prev)
 

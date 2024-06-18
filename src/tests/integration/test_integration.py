@@ -47,6 +47,7 @@ class TestIntegration(unittest.TestCase):
         ]
         start = (1,1)
         end = (1,5)
+        # route: 0,2 -> 0,4 -> 1,5
         expected_jpoints = [(0,2), (0,4)]
         jps = JPS(test_matrix)
         result = jps.jps(start, end)
@@ -55,10 +56,6 @@ class TestIntegration(unittest.TestCase):
         print("shortestPath", result["shortestPath"])
         #print("jpoints", len(result_JPS["jpoints"]))
 
-        """
-        continue: how to get the jump points as a list, try chatgpt4 mornin or try to use
-        prioritized vertices? would it work
-        """
 
 
 if __name__ == '__main__':
