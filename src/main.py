@@ -7,7 +7,7 @@ import importlib
 
 import numpy as np
 from algorithms.dijkstra import Dijkstra
-from algorithms.JPS import JPS
+import algorithms.JPS as JPS
 
 import time
 
@@ -40,9 +40,9 @@ class PathFindingApp:
         self.end_button.grid(row=1, column=0, sticky = 'WE', padx=4)
 
         self.map_options = tk.StringVar()
-        self.map_options.set("random_city")  # Default map option
+        self.map_options.set("Milan")  # Default map option
 
-        map_menu = tk.OptionMenu(input_frame, self.map_options, "random_city", "simple1", "simple2", "Milan")
+        map_menu = tk.OptionMenu(input_frame, self.map_options, "newyork", "shanghai", "Milan")
         #map_menu = tk.OptionMenu(input_frame, self.map_options, "Milan", "Shanghai", "NewYork")#final options
         map_menu.grid(row=2, column=0, sticky = 'WE', padx=4)
 
@@ -56,28 +56,39 @@ class PathFindingApp:
         self.run_dijkstra_button.grid(row=5, column=0, sticky = 'WE', padx=4)
 
         #create labels
-        self.label_jpoints = tk.Label(root, text="", font=("Helvetica", 16))
-        self.label_jpoints.grid(row=14, column=0, columnspan=2, sticky='W', padx=20)
-        self.label_n = tk.Label(root, text="", font=("Helvetica", 16))
-        self.label_n.grid(row=15, column=0, columnspan=2, sticky='W', padx=20)
-        self.label0 = tk.Label(root, text="", font=("Helvetica", 16))
-        self.label0.grid(row=9, column=0, columnspan=2, sticky='W', padx=4)
-        self.label1 = tk.Label(root, text="", font=("Helvetica", 16))
-        self.label1.grid(row=9, column=0, columnspan=2, sticky='W', padx=4)
-        self.label2 = tk.Label(root, text="", font=("Helvetica", 16))
-        self.label2.grid(row=9, column=0, columnspan=2, sticky='W', padx=4)
-        self.label3 = tk.Label(root, text="", font=("Helvetica", 16))
-        self.label3.grid(row=9, column=0, columnspan=2, sticky='W', padx=4)
-        self.label4 = tk.Label(root, text="", font=("Helvetica", 16))
-        self.label4.grid(row=9, column=0, columnspan=2, sticky='W', padx=4)
-        self.label5 = tk.Label(root, text="", font=("Helvetica", 16))
-        self.label5.grid(row=9, column=0, columnspan=2, sticky='W', padx=4)
-        self.label6 = tk.Label(root, text="", font=("Helvetica", 16))
-        self.label6.grid(row=9, column=0, columnspan=2, sticky='W', padx=4)
+        input_labels = tk.Frame(root)
+        input_labels.grid(row=1, column=0, sticky='NS')
+
+        self.label_empty = tk.Label(input_labels, text=" ", font=("Helvetica", 16))
+        self.label_empty.grid(row=5, column=0, columnspan=2, sticky='NW', padx=4)
+
+        self.label_n = tk.Label(input_labels, text="", font=("Helvetica", 16))
+        self.label_n.grid(row=1, column=0, columnspan=2, sticky='NW', padx=10)
+
+        self.label0 = tk.Label(input_labels, text="", font=("Helvetica", 16))
+        self.label0.grid(row=2, column=0, columnspan=2, sticky='NW', padx=4)
+
+        self.label1 = tk.Label(input_labels, text="", font=("Helvetica", 16))
+        self.label1.grid(row=3, column=0, columnspan=2, sticky='NW', padx=4)
+
+        self.label2 = tk.Label(input_labels, text="", font=("Helvetica", 16))
+        self.label2.grid(row=4, column=0, columnspan=2, sticky='NW', padx=4)
+
+        self.label3 = tk.Label(input_labels, text="", font=("Helvetica", 16))
+        self.label3.grid(row=6, column=0, columnspan=2, sticky='NW', padx=10)
+
+        self.label4 = tk.Label(input_labels, text="", font=("Helvetica", 16))
+        self.label4.grid(row=7, column=0, columnspan=2, sticky='NW', padx=4)
+
+        self.label5 = tk.Label(input_labels, text="", font=("Helvetica", 16))
+        self.label5.grid(row=8, column=0, columnspan=2, sticky='NW', padx=4)
+
+        self.label6 = tk.Label(input_labels, text="", font=("Helvetica", 16))
+        self.label6.grid(row=9, column=0, columnspan=2, sticky='NW', padx=4)
 
         #map visualization configuration
         self.canvas = tk.Canvas(root, width=500, height=500, bg="white")
-        self.canvas.grid(row=0, column=3, rowspan=16, sticky = 'E', padx=4)
+        self.canvas.grid(row=0, column=3, rowspan=16, sticky = 'NE', padx=4)
 
         self.canvas.bind("<Button-1>", self.on_canvas_click)
 
@@ -132,6 +143,7 @@ class PathFindingApp:
     def load_map(self):
         #empty the labels
         self.label_n.config(text="")
+        self.label0.config(text="")
         self.label1.config(text="")
         self.label2.config(text="")
         self.label3.config(text="")
@@ -192,50 +204,39 @@ class PathFindingApp:
 
     def run_jps(self):
 
-        #labels to print JPS results
-        self.label4 = tk.Label(root, text="", font=("Helvetica", 16))
-        self.label4.grid(row=10, column=0, columnspan=2, sticky='WE', padx=4)
-        self.label5 = tk.Label(root, text="", font=("Helvetica", 16))
-        self.label5.grid(row=11, column=0, columnspan=2, sticky='WE', padx=4)
-        self.label6 = tk.Label(root, text="", font=("Helvetica", 16))
-        self.label6.grid(row=12, column=0, columnspan=2, sticky='WE', padx=4)
 
-        jps = JPS(self.map)
         start = self.start_coord
         end = self.end_coord
+        neighbor_list, start_position, end_position, cols, field_status = \
+            JPS.initialize_graph(self.map, start, end)
+        #graph = JPS.initialize_graph(self.map, start, end)
 
         #measure path finding time
         start_time = time.time()
-        result = jps.jps(start, end)
+        result = JPS.jump_point_search(neighbor_list, start_position, end_position, cols, field_status)
         end_time = time.time()
+       # print(result)
 
         if result:
-          #  shortest_path = result["shortestPath"]
-            absolute_distance = round(result["absoluteDistance"], 1)
-            explored = len(result["explored"])
-            self.label4.config(text=f"{end_time - start_time}")
-           # self.label4.config(text=f"Path finding execution, JPS: {round((end_time - start_time), 6):.6f} s")
-            self.label5.config(text=f"Absolute distance: {absolute_distance}")
-            self.label6.config(text=f"Number of visited nodes: {explored}")
+            print(end_time - start_time)
+
+            shortest_path = result["shortest_path"]
+            print(shortest_path)
+            absolute_distance = round(result["absolute_distance"], 1)
+            visited = len(result["visited"])
+            self.label3.config(text=f"JPS:")
+            self.label4.config(text=f"{round((end_time - start_time), 6):.6f} s")
+            self.label5.config(text=f"distance: {absolute_distance}")
+            #self.label6.config(text=f"visited: {len(visited)}")
             #self.label_jpoints.config(text=f"Number of jump points: {len(result["jpoints"])}")
-         #   self.draw_route(shortest_path, color="lightpink")
+            self.draw_route(shortest_path, color="lightpink")
             #self.draw_route(result["jpoints"], color="red")
         else:
+            print("eikä")
             self.label4.config(text=f"No path found with JPS.")
             print("No path found.")
 
     def run_dijkstra(self):
-
-        #labels to print  Dijkstra results
-        self.label1 = tk.Label(root, text="", font=("Helvetica", 16))
-        self.label1.grid(row=6, column=0, columnspan=2, sticky='WE', padx=4)
-        self.label2 = tk.Label(root, text="", font=("Helvetica", 16))
-        self.label2.grid(row=7, column=0, columnspan=2, sticky='WE', padx=4)
-        self.label3 = tk.Label(root, text="", font=("Helvetica", 16))
-        self.label3.grid(row=8, column=0, columnspan=2, sticky='WE', padx=4)
-        self.label_empty = tk.Label(root, text="", font=("Helvetica", 16))
-        self.label_empty.grid(row=13, column=0, columnspan=2, sticky='WE', padx=20)
-
 
         dijkstra = Dijkstra(self.map)
         start = self.start_coord
@@ -251,10 +252,10 @@ class PathFindingApp:
             shortest_path = result["shortestPath"]
             absolute_distance = round(result["absoluteDistance"], 1)
             visited = len(result["visited"])
-            #self.label_n.config(text=f"Number of different shortest routes: {routes}")
-            self.label1.config(text=f"Path finding execution, Dijkstra: {round((end_time - start_time), 6):.6f} s")
-            self.label2.config(text=f"Absolute distance: {absolute_distance}")
-            self.label3.config(text=f"Number of visited nodes: {visited}")
+            self.label_n.config(text=f"Dijkstra:")
+            self.label0.config(text=f"{round((end_time - start_time), 6):.6f} s")
+            self.label1.config(text=f"distance: {absolute_distance}")
+            self.label2.config(text=f"visited nodes: {visited}")
             self.draw_route(shortest_path, color="deeppink")
         else:
             self.label1.config(text=f"No path found with Dijkstra.")
