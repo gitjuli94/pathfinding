@@ -148,7 +148,6 @@ def jump_point_search(adjacency_list, start_node, end_node, width, field_status)
 
     cost_until_now[start_node] = 0
     tot_cost_estimate[start_node] = heuristic_octile(start_node, end_node, width)
-   # tot_cost_estimate[start_node] = cost_until_now[start_node]
 
     while not open_set.is_empty():
         current = open_set.dequeue()
