@@ -155,9 +155,12 @@ def jump_point_search(adjacency_list, start_node, end_node, width, field_status)
         if current == end_node:
 
             return {
-                "shortest_path": reconstruct_path(came_from, end_node, width),
-                "visited": visited,
-                "absolute_distance": round(tot_cost_estimate[end_node], 1)
+                "jpoints": reconstruct_path(came_from, end_node, width),
+                "visited": visited_into_coords(visited, width),
+                "absolute_distance": round(tot_cost_estimate[end_node], 1),
+                "came_from": came_from,
+                "end": end_node,
+                "width": width
             }
 
         neighbors = get_neighbors_with_jump_points(current, adjacency_list, width, field_status, directions)
@@ -182,12 +185,45 @@ def jump_point_search(adjacency_list, start_node, end_node, width, field_status)
 
     return {"visited": visited}
 
+def visited_into_coords(visited, width):
+    visited_coordinates = {}
+    for key in visited.keys():
+        visited_coordinates[get_coordinates(key, width)]=None
+    return visited_coordinates
+
+
 def reconstruct_path(came_from, current, width):
     path = [get_coordinates(current, width)]
     while current in came_from:
         current = came_from[current]
         coordinate = get_coordinates(current, width)
         path.insert(0, coordinate)
+    return path
+
+
+def reconstruct_full_path(came_from, current, width):
+    path = [get_coordinates(current, width)]
+    while current in came_from:
+        previous = came_from[current]
+        intermediate_path = interpolate_path(previous, current, width)
+        path = intermediate_path + path[1:]
+        current = previous
+    return path
+
+def interpolate_path(start, end, width):
+    path = []
+    row0, col0 = divmod(start, width)
+    row1, col1 = divmod(end, width)
+
+    d_row = row1 - row0
+    d_col = col1 - col0
+
+    n_steps = max(abs(d_row), abs(d_col))
+    for step in range(n_steps + 1):
+        r = row0 + step * d_row // n_steps
+        c = col0 + step * d_col // n_steps
+        path.append((r, c))
+
     return path
 
 def prune_straight_direction_neighbors(target, dx, dy, adjacency_list, width, field_status, directions):
@@ -316,6 +352,8 @@ def get_neighbors_with_jump_points(parent, adjacency_list, width, field_status, 
 
 def initialize_graph(matrix, start, goal):
     return generate_graph(matrix, start, goal)
+
+
 
 
 

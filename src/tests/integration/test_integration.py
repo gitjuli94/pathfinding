@@ -116,8 +116,22 @@ class TestIntegration(unittest.TestCase):
             self.assertEqual(result_JPS["absolute_distance"], result_Dijkstra["absoluteDistance"])
 
             #print("JPS:", result_JPS["absolute_distance"])
-            #print("dijkstra:", result_Dijkstra["absoluteDistance"])
+            #print("dijkstra:", result_Dijkstra["absoluteDistance"])"""
 
+    """def test_both_random_route(self):
+        matrix = milan
+        start = (41, 75)
+        end = (32, 10)
+        dijkstra = Dijkstra(matrix)
+        result_Dijkstra = dijkstra.find_distances(start, end)
+
+        neighbor_list, start_position, end_position, cols, field_status = \
+            JPS.initialize_graph(matrix, start, end)
+
+        result_JPS = JPS.jump_point_search(neighbor_list, start_position, end_position, cols, field_status)
+        self.assertEqual(result_JPS["absolute_distance"], result_Dijkstra["absoluteDistance"])
+        #print("expeted:97,5")
+       # print("jps:", result_JPS["absolute_distance"]) """
 
 
 if __name__ == '__main__':
