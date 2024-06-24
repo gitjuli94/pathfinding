@@ -3,12 +3,10 @@ Jump point search algorithm for shortest path finding.
 """
 
 import math
-from heapq import heappush, heappop
-#from network import Generate_Network
+from minheap import MinHeapQueue
 from algorithms.graph_array import generate_graph, get_coordinates
 import math
 #from newyork import input_matrix
-#import time
 
 
 
@@ -32,125 +30,27 @@ def heuristic_octile(node: int, end_node: int, width: int) -> float:
 
     return heuristic
 
-"""class PriorityQueue:
-    def __init__(self):
-        self.elements = []
 
-    def enqueue(self, item, priority):
-        heappush(self.elements, (priority, item))
 
-    def dequeue(self):
-        return heappop(self.elements)[1]
-
-    def is_empty(self):
-        return not self.elements
-
-    def contains(self, item):
-        return any(element[1] == item for element in self.elements)
-
-    def decrease_priority(self, item, priority):
-        for i, (p, element) in enumerate(self.elements):
-            if element == item:
-                if p > priority:
-                    del self.elements[i]
-                    heappush(self.elements, (priority, item))
-                break"""
-
-class PriorityQueue:
-    def __init__(self):
-        self.heap = []
-
-    def enqueue(self, element, priority):
-        self.heap.append({'element': element, 'priority': priority})
-        self.bubble_up()
-
-    def dequeue(self):
-        if not self.is_empty():
-            top = self.heap[0]
-            last = self.heap.pop()
-
-            if len(self.heap) > 0:
-                self.heap[0] = last
-                self.bubble_down()
-
-            return top['element']
-        return None
-
-    def bubble_up(self, start_index=None):
-        index = start_index if start_index is not None else len(self.heap) - 1
-
-        while index > 0:
-            parent_index = (index - 1) // 2
-
-            if self.heap[index]['priority'] < self.heap[parent_index]['priority']:
-                self.swap(index, parent_index)
-                index = parent_index
-            else:
-                break
-
-    def bubble_down(self):
-        index = 0
-
-        while True:
-            left_child_index = 2 * index + 1
-            right_child_index = 2 * index + 2
-
-            smallest_child_index = index
-
-            if (left_child_index < len(self.heap) and
-                self.heap[left_child_index]['priority'] < self.heap[smallest_child_index]['priority']):
-                smallest_child_index = left_child_index
-
-            if (right_child_index < len(self.heap) and
-                self.heap[right_child_index]['priority'] < self.heap[smallest_child_index]['priority']):
-                smallest_child_index = right_child_index
-
-            if smallest_child_index != index:
-                self.swap(index, smallest_child_index)
-                index = smallest_child_index
-            else:
-                break
-
-    def swap(self, i, j):
-        self.heap[i], self.heap[j] = self.heap[j], self.heap[i]
-
-    def decrease_priority(self, element, new_priority):
-        index = self.find_index(element)
-
-        if index != -1 and new_priority < self.heap[index]['priority']:
-            self.heap[index]['priority'] = new_priority
-            self.bubble_up(index)
-
-    def find_index(self, element):
-        for i, item in enumerate(self.heap):
-            if item['element'] == element:
-                return i
-        return -1
-
-    def is_empty(self):
-        return len(self.heap) == 0
-
-    def contains(self, element):
-        return any(item['element'] == element for item in self.heap)
 
 
 def jump_point_search(adjacency_list, start_node, end_node, width, field_status):
-    open_set = PriorityQueue()
+    heap_queue = MinHeapQueue()
     came_from = {}
     cost_until_now = {} # cheapest cost until now
     tot_cost_estimate = {} # estimate of the total cost
     directions = {}
     visited = {}
 
-    open_set.enqueue(start_node, 0)
+    heap_queue.enqueue(start_node, 0)
 
     directions[start_node] = set(["1,0", "-1,0", "0,1", "0,-1", "1,-1", "1,1", "-1,1", "-1,-1"])
 
     cost_until_now[start_node] = 0
     tot_cost_estimate[start_node] = heuristic_octile(start_node, end_node, width)
 
-    while not open_set.is_empty():
-        current = open_set.dequeue()
+    while not heap_queue.is_empty():
+        current = heap_queue.dequeue()
 
         if current == end_node:
 
@@ -176,10 +76,10 @@ def jump_point_search(adjacency_list, start_node, end_node, width, field_status)
                 cost_until_now[neighbor] = tentative_cost_until_now
                 tot_cost_estimate[neighbor] = tentative_cost_until_now + round(heuristic_octile(neighbor, end_node, width), 10)
 
-                if open_set.contains(neighbor):
-                    open_set.decrease_priority(neighbor, tot_cost_estimate[neighbor])
+                if heap_queue.contains(neighbor):
+                    heap_queue.decrease_priority(neighbor, tot_cost_estimate[neighbor])
                 else:
-                    open_set.enqueue(neighbor, tot_cost_estimate[neighbor])
+                    heap_queue.enqueue(neighbor, tot_cost_estimate[neighbor])
 
         visited[current] = True
 
