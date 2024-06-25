@@ -15,6 +15,7 @@ import algorithms.JPS as JPS
 from algorithms.dijkstra import Dijkstra
 from data.maps.simple1 import input_matrix as matrix1
 from data.maps.milan import input_matrix as milan
+from data.maps.newyork import input_matrix as newyork
 
 class TestIntegration(unittest.TestCase):
     def setUp(self):
@@ -90,6 +91,7 @@ class TestIntegration(unittest.TestCase):
 
         y=len(matrix) #rows
         x=len(matrix[0]) #cols
+        print("x", x)
 
         free_space=[]
 

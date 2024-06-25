@@ -10,7 +10,6 @@ src_dir = Path(__file__).resolve().parent.parent.parent
 sys.path.append(str(src_dir))
 
 from algorithms.graph_array import generate_graph, get_coordinates
-from data.maps.simple1 import input_matrix
 
 class TestGraph(unittest.TestCase):
     def setUp(self):
@@ -51,6 +50,9 @@ class TestGraph(unittest.TestCase):
         self.assertEqual(graph[0][8], [5, 7, 4])
         self.assertEqual(graph[0][6], [3, 7, 4])
 
+    def test_get_coordinates(self):
+        coords = get_coordinates(10, 3)
+        self.assertEqual(coords, (3, 1))
 
 if __name__ == '__main__':
     unittest.main()

@@ -220,15 +220,20 @@ class PathFindingApp:
 
         start = self.start_coord
         end = self.end_coord
+
+        #start = (24, 226)
+        #end = (255, 27)
+        #start = (166, 45)
+        #end = (150, 181)
         neighbor_list, start_position, end_position, cols, field_status = \
             JPS.initialize_graph(self.map, start, end)
-        #graph = JPS.initialize_graph(self.map, start, end)
+
 
         #measure path finding time
         start_time = time.time()
         result = JPS.jump_point_search(neighbor_list, start_position, end_position, cols, field_status)
         end_time = time.time()
-       # print(result)
+        #print(result)
 
         if result:
             print(end_time - start_time)
@@ -262,6 +267,7 @@ class PathFindingApp:
         dijkstra = Dijkstra(self.map)
         start = self.start_coord
         end = self.end_coord
+
 
         #measure path finding time
         start_time = time.time()

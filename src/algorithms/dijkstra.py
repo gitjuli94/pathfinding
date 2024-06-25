@@ -10,7 +10,6 @@ https://tira.mooc.fi/kevat-2024/osa14/
 import sys
 from pathlib import Path
 src_dir = Path(__file__).resolve().parent.parent
-print("tää", src_dir)
 sys.path.append(str(src_dir))
 #########
 
@@ -122,4 +121,4 @@ start_time = time.time()
 result = dijkstra.find_distances(start, end)
 end_time = time.time()
 
-print(result["absoluteDistance"])
+#print(result["absoluteDistance"])
