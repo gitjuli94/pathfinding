@@ -1,6 +1,6 @@
 
 # Input and output files
-input_file_path = 'additional_scripts/NewYork_2_256.map'
+input_file_path = 'additional_scripts/Moscow_0_256.map'
 output_file_path = 'additional_scripts/output.txt'
 
 

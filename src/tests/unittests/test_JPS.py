@@ -33,6 +33,21 @@ class TestJPS(unittest.TestCase):
         #print(result)
         self.assertEqual(result["absolute_distance"], (111)) #pitäis olla 111
         #self.assertEqual(result["jpoints"], expected_jpoints)
+
+    def test_shortest_path_example1(self):
+        """
+        Expected distance 12.1, example from here:
+        https://blog.finxter.com/jump-search-algorithm-in-python-a-helpful-guide-with-video/
+        """
+        matrix = [
+        [0,0,1,0,0,0,0,0,0],
+        [0,0,1,0,1,0,0,0,0],
+        [0,0,1,0,1,0,1,0,0],
+        [0,0,0,0,1,0,1,0,0],
+        [0,0,0,0,0,0,1,0,0],
+        [0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0]
+        ]
     """def test_shortest_path_paris(self):
         # Test shortest distance with the test graph paris
         # 242	243	6	18	390.30360718

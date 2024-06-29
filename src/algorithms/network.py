@@ -21,21 +21,27 @@ class Generate_Network:
 
         return self.graph
 
-    def add_edges(self, x: int, y: int):
+    def add_edges(self, y: int, x: int):
         directions = [(-1, 0), (1, 0), (0, -1), (0, 1),
                       (-1, -1), (-1, 1), (1, -1), (1, 1)]
 
-        for dx, dy in directions:
-            nx, ny = x + dx, y + dy
-            if 0 <= nx < self.rows and 0 <= ny < self.cols and self.matrix[nx][ny] == 0:
-                weight = 1 if abs(dx) + abs(dy) == 1 else 2**0.5
-                self.graph[(x, y)].append(((nx, ny), weight))
+        for dy, dx in directions:
+            ny, nx = y + dy, x + dx
+            if 0 <= ny < self.rows and 0 <= nx < self.cols and self.matrix[ny][nx] == 0:
 
-matrix = [
-            [0, 1, 0],
-            [1, 0, 1],
-            [0, 1, 0]
+                weight = 1 if abs(dx) + abs(dy) == 1 else 2**0.5
+                if weight > 1: # diagonal edge
+                    if self.matrix[ny][x] == 0 and self.matrix[y][nx] == 0: # don't add edges to diagonally pass corners
+                        self.graph[(y, x)].append(((ny, nx), weight))       # (only orthogonal movement around corners)
+                else:
+                    self.graph[(y, x)].append(((ny, nx), weight))
+
+
+"""matrix = [
+            [0, 0, 0],
+            [0, 0, 1],
+            [0, 0, 1]
         ]
 
-#result = Generate_Network(matrix)
-#print(result.graph)
+result = Generate_Network(matrix)
+print(result.graph)"""

@@ -7,7 +7,7 @@ import importlib
 
 import numpy as np
 from algorithms.dijkstra import Dijkstra
-import algorithms.JPS as JPS
+from algorithms.JPS import JPS
 
 import time
 
@@ -41,9 +41,9 @@ class PathFindingApp:
         self.end_button.grid(row=1, column=0, sticky = 'WE', padx=4)
 
         self.map_options = tk.StringVar()
-        self.map_options.set("Milan")  # Default map option
+        self.map_options.set("Moscow")  # Default map option
 
-        map_menu = tk.OptionMenu(input_frame, self.map_options, "NewYork", "Shanghai", "Milan")
+        map_menu = tk.OptionMenu(input_frame, self.map_options, "NewYork", "Shanghai", "Moscow")
         map_menu.grid(row=2, column=0, sticky = 'WE', padx=4)
 
         self.load_map_button = tk.Button(input_frame, text="Load Map", command=self.load_map)
@@ -167,7 +167,6 @@ class PathFindingApp:
             #messagebox.showinfo("Map Loaded")
             self.draw_map()
         except ImportError as e:
-            print("noi")
             messagebox.showerror("Error", f"Failed to load map: {e}")
 
     def draw_map(self):
@@ -225,41 +224,36 @@ class PathFindingApp:
         #end = (255, 27)
         #start = (166, 45)
         #end = (150, 181)
-        neighbor_list, start_position, end_position, cols, field_status = \
-            JPS.initialize_graph(self.map, start, end)
+        jps = JPS(self.map)
 
 
         #measure path finding time
         start_time = time.time()
-        result = JPS.jump_point_search(neighbor_list, start_position, end_position, cols, field_status)
+        result = jps.jump_point_search(start, end)
         end_time = time.time()
-        #print(result)
+
 
         if result:
-            print(end_time - start_time)
-
-            jpoints = result["jpoints"]
-            absolute_distance = round(result["absolute_distance"], 1)
+            #jpoints = result["jpoints"]
+            #print(jpoints)
+            path = result["path"]
+            absolute_distance = round(result["absoluteDistance"])/2
             visited = result["visited"]
-            came_from = result["came_from"]
-            end = result["end"]
-            width = result["width"]
-            full_path = JPS.reconstruct_full_path(came_from, end, width)
 
             self.label3.config(text=f"JPS:")
             self.label4.config(text=f"{round((end_time - start_time), 6):.6f} s")
             self.label5.config(text=f"distance: {absolute_distance}")
-            self.label6.config(text=f"visited: {len(visited)}")
-            self.draw_visited(visited.keys(), color="orange", dot_radius=2)
-            self.draw_route(full_path, color="greenyellow")
-            self.draw_route(jpoints, color="red")
+            self.label6.config(text=f"visited: {len(set((visited)))}")
 
+            self.draw_route(path, color="green2")
+            self.draw_visited(visited, color="orange", dot_radius=2)
+            #self.draw_visited(jpoints, color="red", dot_radius=4)
 
-           # print("full_path tässä", full_path)
-           # print("visited", visited)
-           # print("jpoints", jpoints)
         else:
-            self.label4.config(text=f"No path found with JPS.")
+            self.label3.config(text=f"JPS:")
+            self.label4.config(text=f"No path found.")
+            self.label5.config(text=f"")
+            self.label6.config(text=f"")
             print("No path found.")
 
     def run_dijkstra(self):
@@ -277,7 +271,7 @@ class PathFindingApp:
         if result:
             #routes = len(result["Routes"])
             shortest_path = result["shortestPath"]
-            absolute_distance = round(result["absoluteDistance"], 1)
+            absolute_distance = round(result["absoluteDistance"])/2
             visited = result["visited"]
             self.label_n.config(text=f"Dijkstra:")
             self.label0.config(text=f"{round((end_time - start_time), 6):.6f} s")
@@ -287,7 +281,10 @@ class PathFindingApp:
             self.draw_route(shortest_path, color="deeppink")
 
         else:
-            self.label1.config(text=f"No path found with Dijkstra.")
+            self.label_n.config(text=f"Dijkstra:")
+            self.label0.config(text=f"No path found.")
+            self.label1.config(text=f"")
+            self.label2.config(text=f"")
             print("No path found.")
 
 

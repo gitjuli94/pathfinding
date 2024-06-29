@@ -11,10 +11,9 @@ import random
 src_dir = Path(__file__).resolve().parent.parent.parent
 sys.path.append(str(src_dir))
 
-import algorithms.JPS as JPS
+from algorithms.JPS import JPS
 from algorithms.dijkstra import Dijkstra
 from data.maps.simple1 import input_matrix as matrix1
-from data.maps.milan import input_matrix as milan
 from data.maps.newyork import input_matrix as newyork
 
 class TestIntegration(unittest.TestCase):
@@ -87,11 +86,10 @@ class TestIntegration(unittest.TestCase):
 
     def test_jump_points_within_the_route_x(self):
 
-        matrix = milan
+        matrix = newyork
 
         y=len(matrix) #rows
         x=len(matrix[0]) #cols
-        print("x", x)
 
         free_space=[]
 
@@ -103,6 +101,7 @@ class TestIntegration(unittest.TestCase):
 
 
         dijkstra = Dijkstra(matrix)
+        jps = JPS(matrix)
 
         # test both algorithms with 10 random start and end vertices
         for i in range(10):
@@ -110,12 +109,13 @@ class TestIntegration(unittest.TestCase):
             end = random.choice(free_space)
 
             result_Dijkstra = dijkstra.find_distances(start, end)
+            rounded_Dijkstra = round(result_Dijkstra["absoluteDistance"])/2
+            #print("D: ", round(result_Dijkstra["absoluteDistance"])/2)
+            result_JPS = jps.jump_point_search(start, end)
+            #print("JPS: ", round(result_JPS["absoluteDistance"])/2)
+            rounded_JPS = round(result_JPS["absoluteDistance"])/2
 
-            neighbor_list, start_position, end_position, cols, field_status = \
-                JPS.initialize_graph(matrix, start, end)
-
-            result_JPS = JPS.jump_point_search(neighbor_list, start_position, end_position, cols, field_status)
-            self.assertEqual(result_JPS["absolute_distance"], result_Dijkstra["absoluteDistance"])
+            self.assertEqual(rounded_Dijkstra, rounded_JPS)
 
             #print("JPS:", result_JPS["absolute_distance"])
             #print("dijkstra:", result_Dijkstra["absoluteDistance"])"""

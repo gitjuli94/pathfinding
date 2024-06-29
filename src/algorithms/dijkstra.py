@@ -13,7 +13,7 @@ src_dir = Path(__file__).resolve().parent.parent
 sys.path.append(str(src_dir))
 #########
 
-
+from math import inf
 import heapq
 from algorithms.network import Generate_Network
 
@@ -29,7 +29,7 @@ class Dijkstra:
         routes = [] # list of different routes with same distance
         distances = {}
         for node in self.nodes:
-            distances[node] = float("inf")
+            distances[node] = inf
         distances[start_node] = 0
         #print(distances)
         #came_from = {node: [] for node in self.nodes}   # Dictionary to store all predecessors in a list (for all routes)
@@ -39,7 +39,7 @@ class Dijkstra:
         heapq.heappush(queue, (0, start_node))
         visited = set()
         if end_node not in self.graph or start_node not in self.graph:
-            print("Check that start and end nodes are correctly specified.")
+            #print("Check that start and end nodes are correctly specified.")
             return False
 
         while queue:
@@ -47,6 +47,7 @@ class Dijkstra:
             #with a heap structure the first in the queue is always the one with the smallest distance
             #because the heap structure is saved as a tuple : (distance, node)
             node_a = heapq.heappop(queue)[1]
+            #print(node_a, distances[node_a])
             if node_a == end_node:
                 #routes.extend(self.reconstruct_paths(came_from, end_node)) # Add all routes to a list
 
@@ -62,15 +63,15 @@ class Dijkstra:
                     #"Routes": routes, # list of shortest paths found
                     "visited": visited,
                     #using round to handle floating point precision issues
-                    #"absoluteDistance": round(distances[end_node] + 1e-9, 1) -> unnecessary?
-                    "absoluteDistance": round(distances[end_node], 1)
+                    #"absoluteDistance": round(distances[end_node] + 1e-9, 1) #-> unnecessary?
+                    "absoluteDistance": distances[end_node]
                 }
             if node_a in visited:
                 continue
             visited.add(node_a)
 
             for node_b, weight in self.graph[node_a]:#go through all node a's neighbors and distances
-                new_distance = distances[node_a] + weight#calculate new distance
+                new_distance = distances[node_a] + weight #calculate new distance
                 if new_distance < distances[node_b]:
                     distances[node_b] = new_distance
                     new_pair = (new_distance, node_b)
@@ -83,7 +84,7 @@ class Dijkstra:
                     #came_from[node_b].append(node_a)
                 ###
 
-        if distances[end_node] == float("inf"):
+        if distances[end_node] == inf:
             return False
 
     def reconstruct_paths(self, came_from, current):
@@ -108,17 +109,54 @@ class Dijkstra:
         return path
 
 
-
-from data.maps.newyork_test import input_matrix
+"""from data.maps.paris import input_matrix as paris
+from data.maps.simple1 import input_matrix as simple1
+from data.maps.newyork import input_matrix as newyork
+from data.maps.shanghai import input_matrix as shanghai
 import time
 
-dijkstra = Dijkstra(input_matrix)
-start = (16, 31)
-end = (46, 74)
+
+
+
+matrix = [
+[0,0,1,0,0,0,0,0,0],
+[0,0,1,0,1,0,0,0,0],
+[0,0,1,0,1,0,1,0,0],
+[0,0,0,0,1,0,1,0,0],
+[0,0,0,0,0,0,1,0,0],
+[0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0]
+]
+start = (0, 0)
+end = (1, 8)
+
+matrix = [
+[0,0,0,0,0,0,0,0],
+[0,0,0,0,1,0,0,0],
+[0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0]
+]
+end = (1, 5)
+start = (1, 1)
+
+#NewYork_2_256.map 17	209	253	40	344.58787842 (x,y)
+start = (209, 17) # (y,x)
+end = (40,253)
+start, end = (234, 242), (18,6)
+
+#start = (149, 4) #kokeily, yli 3s laskentaaika, shanghai
+#end = (55, 153)
+dijkstra = Dijkstra(paris)
+
+#paris 29	9	253	253	388.61731567
+start, end = (9,29), (253,253)
+print(start)
+
+
 
 #measure path finding time
 start_time = time.time()
 result = dijkstra.find_distances(start, end)
 end_time = time.time()
-
-#print(result["absoluteDistance"])
+print("time: ", end_time-start_time)
+print(result["absoluteDistance"])"""
