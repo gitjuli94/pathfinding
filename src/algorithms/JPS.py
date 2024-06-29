@@ -294,12 +294,13 @@ end = (1, 1)
 start = (209, 17) # (y,x)
 end = (40,253)
 
-map = moscow
+map = newyork
 
 jps = JPS(map)
 
 #start = (149, 4) #kokeily, yli 3s laskentaaika, shanghai
 #end = (55, 153)
+
 
 #measure path finding time
 start_time = time.time()

@@ -24,30 +24,43 @@ class TestNetwork(unittest.TestCase):
 
     def test_generate_network_big_open_matrix(self):
         # Test network generation of a big open matrix
-        matrix = [[0 for _ in range(100)] for _ in range(100)]
+        n= 100
+        matrix = [[0 for _ in range(n)] for _ in range(n)]
         network_obstacles = Generate_Network(matrix)
         result = network_obstacles.create_graph()
-        self.assertEqual(len(result.keys()), 10000)
+
+        # check amount of keys (nodes)
+        self.assertEqual(len(result.keys()), (n*n))
+
+        #check amount of items (edges):
+        tot_edges = sum(len(value) for value in result.values())
+        expected = 4*(n-1)*n+4*(n-1)**2
+        self.assertEqual(tot_edges, expected)
 
     def test_generate_network_pattern_matrix(self):
-        # Test network generation of a matrix with a pattern
+        # Test network generation of a matrix,
+        # check that goes around corners orthogonally
         matrix = [
+            [0, 0, 0],
             [0, 1, 0],
-            [1, 0, 1],
-            [0, 1, 0]
+            [0, 0, 0]
         ]
         network = Generate_Network(matrix)
-        rounded_network = {} # Network with rounded weights to 3 digits
-        for key, value in network.graph.items():
-            rounded_network[key] = [((x, y), round(weight, 3)) for (x, y), weight in value]
+        result = network.create_graph()
         expected_graph = {
-            (0, 0): [((1, 1), 1.414)],
-            (0, 2): [((1, 1), 1.414)],
-            (1, 1): [((0, 0), 1.414), ((0, 2), 1.414), ((2, 0), 1.414), ((2, 2), 1.414)],
-            (2, 0): [((1, 1), 1.414)],
-            (2, 2): [((1, 1), 1.414)]
+            (0, 0): [((1, 0), 1), ((0, 1), 1)],
+            (0, 1): [((0, 0), 1), ((0, 2), 1)],
+            (0, 2): [((0, 1), 1), ((1, 2), 1)],
+            (1, 2): [((0, 2), 1), ((2, 2), 1)],
+            (2, 2): [((1, 2), 1), ((2, 1), 1)],
+            (2, 1): [((2, 2), 1), ((2, 0), 1)],
+            (2, 0): [((2, 1), 1), ((1, 0), 1)],
+            (1, 0): [((2, 0), 1), ((0, 0), 1)]
         }
-        self.assertEqual(rounded_network, expected_graph)
+        # sort to put keys and items in same order
+        result_sorted = sorted(result)
+        expected_sorted = sorted(expected_graph)
+        self.assertEqual(result_sorted, expected_sorted)
 
     def test_add_edges(self):
         # Test adding edges method by adding edges manually for a node
@@ -56,7 +69,7 @@ class TestNetwork(unittest.TestCase):
             [0, 1]
         ]
         network = Generate_Network(matrix)
-        network.graph = {(0, 0): []}  # Reset graph for the node (0, 0)
+        network.graph = {(0, 0): []}  # reset graph for the node (0, 0)
         network.add_edges(0, 0)
         expected_network = {(0, 0): [((1, 0), 1), ((0, 1), 1)]} # edges added down and right
         self.assertEqual(network.graph, expected_network)

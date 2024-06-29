@@ -1,7 +1,7 @@
 
 # Input and output files
-input_file_path = 'additional_scripts/Moscow_0_256.map'
-output_file_path = 'additional_scripts/output.txt'
+input_file_path = 'util_files/Sydney_0_1024.map'
+output_file_path = 'util_files/output.txt'
 
 
 def process_file(input_file_path, output_file_path):

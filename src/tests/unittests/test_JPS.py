@@ -4,101 +4,120 @@ Unit testing for JPS algorithm.
 import unittest
 import sys
 from pathlib import Path
-import math
+import random
 
 
 # get the tested algorithm from a separate parent directory
 src_dir = Path(__file__).resolve().parent.parent.parent
 sys.path.append(str(src_dir))
 
-from algorithms.JPS import *
+from algorithms.JPS import JPS
 from algorithms.dijkstra import Dijkstra
-from data.maps.milan import input_matrix as milan
-from data.maps.paris import input_matrix as paris
+from data.maps.newyork import input_matrix as newyork
+from data.maps.shanghai import input_matrix as shanghai
 
 class TestJPS(unittest.TestCase):
     def setUp(self):
-        # Initialize the JPS with a test matrix
         pass
 
-    def test_shortest_path_milan(self):
-        # Test shortest distance with the test graph milan
-        matrix=milan
-        start = (45, 74)
-        end = (2, 23)
+    def test_shortest_path_complex_map_paris(self):
+        # Test scenario from moving AI: NewYork_2_256.map	256	256	236	236	19	25	337.78888855
+        # route direction: bottom right corner -> upper left corner
+        matrix = newyork
+        start = (236, 236)
+        end = (25, 19)
+        jps = JPS(matrix)
+        result = jps.jump_point_search(start, end)
+        self.assertEqual(round((result["absoluteDistance"]), 1), (337.8))
 
-        neighbor_list, start_position, end_position, cols, field_status = \
-            initialize_graph(matrix, start, end)
-        result = jump_point_search(neighbor_list, start_position, end_position, cols, field_status)
-        #print(result)
-        self.assertEqual(result["absolute_distance"], (111)) #pitäis olla 111
-        #self.assertEqual(result["jpoints"], expected_jpoints)
-
-    def test_shortest_path_example1(self):
-        """
-        Expected distance 12.1, example from here:
-        https://blog.finxter.com/jump-search-algorithm-in-python-a-helpful-guide-with-video/
-        """
-        matrix = [
-        [0,0,1,0,0,0,0,0,0],
-        [0,0,1,0,1,0,0,0,0],
-        [0,0,1,0,1,0,1,0,0],
-        [0,0,0,0,1,0,1,0,0],
-        [0,0,0,0,0,0,1,0,0],
-        [0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0]
-        ]
-    """def test_shortest_path_paris(self):
-        # Test shortest distance with the test graph paris
-        # 242	243	6	18	390.30360718
-        matrix = paris
-        start = (242, 243)
-        end = (6, 18)
-        neighbor_list, start_position, end_position, cols, field_status = \
-            initialize_graph(matrix, start, end)
-        result = jump_point_search(neighbor_list, start_position, end_position, cols, field_status)
-        #print(result)
-        #self.assertEqual(result["absolute_distance"], (390.3))
-        #self.assertEqual(result["jpoints"], expected_jpoints)
-
-    def test_against_dijkstra_milan_1(self): #doesnt work
-        matrix=milan
-        start = (45, 74) #
-        end = (2, 23)
-        dijkstra = Dijkstra(matrix)
-        result_D = dijkstra.find_distances(start, end)
-        neighbor_list, start_position, end_position, cols, field_status = \
-            initialize_graph(matrix, start, end)
-        result_JPS = jump_point_search(neighbor_list, start_position, end_position, cols, field_status)
-        #self.assertEqual(result_D["absoluteDistance"], result_JPS["absolute_distance"])
-
-    def test_against_dijkstra_milan_2(self): #works
-        matrix=milan
-        start = (29, 54)
-        end = (68, 120)
-        dijkstra = Dijkstra(matrix)
-        result_D = dijkstra.find_distances(start, end)
-        neighbor_list, start_position, end_position, cols, field_status = \
-            initialize_graph(matrix, start, end)
-        result_JPS = jump_point_search(neighbor_list, start_position, end_position, cols, field_status)
-        self.assertEqual(result_D["absoluteDistance"], result_JPS["absolute_distance"])
+    def test_shortest_path_complex_map_newyork(self):
+        # Test scenario from moving AI: 95	NewYork_2_256.map	256	256	36	14	232	253	341.27416992
+        # route direction: upper left corner -> bottom right corner
+        matrix = newyork
+        start = (14,36)
+        end = (253,232)
+        jps = JPS(matrix)
+        result = jps.jump_point_search(start, end)
+        self.assertEqual(round((result["absoluteDistance"]), 1), (341.3))
 
     def test_no_path_1(self):
         # Test no path with the test graph, start is isolated
-        #jps = JPS(self.test_matrix)
-        #result = self.jps.jps((6, 3), (11, 13))
-        #self.assertEqual(result, False)
+        matrix = [
+                [0,0,0],
+                [1,1,0],
+                [0,1,0]
+                ]
+        jps = JPS(matrix)
+        result = jps.jump_point_search((2,0), (0,0))
+        self.assertEqual(result, False)
+
+    def test_no_path_2(self):
+        # Test no path with the test graph, end is isolated
+        matrix = [
+                [0,0,0],
+                [1,1,0],
+                [0,1,0]
+                ]
+        jps = JPS(matrix)
+        result = jps.jump_point_search((0,0), (2,0))
+        self.assertEqual(result, False)
 
     def test_invalid_nodes(self):
         # Test when both nodes are not within the graph
-        result = self.jps.jps((0,0), (0,8))
-        self.assertFalse(result)
-        # Test when start node is not within the graph
-        result = self.jps.jps((11,6), (4,13))
-        self.assertFalse(result)
-        # Test when end node is not within the graph
-        result = self.jps.jps((5,8), (10,13))
-        self.assertFalse(result)"""
+        matrix = [
+                [0,0,0],
+                [1,1,0],
+                [0,1,0]
+                ]
+        jps = JPS(matrix)
+        result = jps.jump_point_search((1,0), (2,1))
+        self.assertEqual(result, False)
+
+    def test_reconstruct_path(self):
+        # Test the path reconstruction function
+        matrix = [
+                [0,0,1,1,1,0,0,0],
+                [0,0,1,1,1,0,0,0],
+                [0,0,0,0,0,0,0,0],
+                [0,0,0,0,0,0,0,0]
+                ]
+        start = (1, 1)
+        end = (1, 5)
+        jps = JPS(matrix)
+        result = jps.jump_point_search(start, end)
+        test_path = result["path"]
+        expected_path = [(1,1), (2,1), (2,2), (2,3), (2,4), (2,5), (1,5)]
+        self.assertEqual(test_path, expected_path)
+
+    def test_JPS_against_Dijsktra_with_random_inputs(self):
+
+        # test map with no isolated free nodes
+        matrix = shanghai
+
+        y=len(matrix) #rows
+        x=len(matrix[0]) #cols
+
+        free_space=[]
+
+        # choose points from the free area within the map
+        for i in range(y):
+            for j in range(x):
+                if matrix[i][j] == 0:
+                    free_space.append((i,j))
+
+
+        dijkstra = Dijkstra(matrix)
+        jps = JPS(matrix)
+
+        # test both algorithms with 10 random start and end nodes
+        for i in range(10):
+            start = random.choice(free_space)
+            end = random.choice(free_space)
+
+            result_Dijkstra = dijkstra.find_distances(start, end)
+            result_JPS = jps.jump_point_search(start, end)
+            self.assertEqual(round((result_Dijkstra["absoluteDistance"]), 1), round((result_JPS["absoluteDistance"]), 1))
+
 
 if __name__ == '__main__':
     unittest.main()
