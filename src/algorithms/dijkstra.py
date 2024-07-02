@@ -22,11 +22,9 @@ class Dijkstra:
         network = Generate_Network(matrix)
         self.nodes = network.graph.keys()
         self.graph = network.graph
-       # print(self.graph)
-       # print(self.nodes)
 
     def find_distances(self, start_node, end_node):
-        routes = [] # list of different routes with same distance
+        #routes = [] # list of different routes with same distance
         distances = {}
         for node in self.nodes:
             distances[node] = inf
@@ -49,12 +47,6 @@ class Dijkstra:
             node_a = heapq.heappop(queue)[1]
             #print(node_a, distances[node_a])
             if node_a == end_node:
-                #routes.extend(self.reconstruct_paths(came_from, end_node)) # Add all routes to a list
-
-                #print("n of routes: ", len(routes))
-                #print("routes: ", routes)
-                #print("from: ", came_from)
-                #print("route1: ", sorted(routes)[0])
 
                 return {
                     "cameFrom": came_from, #return dictionary of predecessor nodes
@@ -84,11 +76,11 @@ class Dijkstra:
                     #came_from[node_b].append(node_a)
                 ###
 
-        if distances[end_node] == inf:
-            return False
+        #if distances[end_node] == inf:
+        return False
 
-    def reconstruct_paths(self, came_from, current):
-        # reconstruct multiple paths
+    """def reconstruct_paths(self, came_from, current):
+        # reconstruct multiple paths (not used in this project)
         if not came_from[current]: # base case for recursion
             return [[current]] # if no predeccors, only returns the current node (start node)
         paths = []
@@ -96,7 +88,7 @@ class Dijkstra:
             for path in self.reconstruct_paths(came_from, prev):
                 paths.append(path + [current])
         #print("paths: ", paths)
-        return paths
+        return paths"""
 
     def reconstruct_path(self, came_from, current):
         #for a single path
