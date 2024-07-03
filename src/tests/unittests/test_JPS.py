@@ -14,7 +14,7 @@ sys.path.append(str(src_dir))
 from algorithms.JPS import JPS
 from algorithms.dijkstra import Dijkstra
 from data.maps.newyork import input_matrix as newyork
-from data.maps.shanghai import input_matrix as shanghai
+from data.maps.boston_2_256 import input_matrix as boston
 
 class TestJPS(unittest.TestCase):
     def setUp(self):
@@ -91,22 +91,20 @@ class TestJPS(unittest.TestCase):
 
     def test_JPS_against_Dijsktra_with_random_inputs(self):
 
-        # test map with no isolated free nodes
-        matrix = shanghai
-
-        y=len(matrix) #rows
-        x=len(matrix[0]) #cols
+        # test map without big isolated areas
+        matrix = boston
 
         free_space=[]
 
-        # choose points from the free area within the map
-        for i in range(y):
-            for j in range(x):
-                if matrix[i][j] == 0:
-                    free_space.append((i,j))
-
-
         dijkstra = Dijkstra(matrix)
+        graph = dijkstra.graph
+
+
+        # choose suitable points from the nodes in the graph
+        for node in dijkstra.nodes:
+            if len(graph[node]) > 1: # if a node has enough edges, it's not isolated (e.g. inside a building)
+                free_space.append(node)
+
         jps = JPS(matrix)
 
         # test both algorithms with 10 random start and end nodes

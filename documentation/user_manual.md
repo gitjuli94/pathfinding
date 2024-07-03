@@ -31,7 +31,7 @@ poetry shell
 
 5) **Run the app**
 ```bash
-python main.py
+python3 main.py
 ```
 
 6) **Run the algorithms**

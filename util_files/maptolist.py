@@ -1,6 +1,6 @@
 
 # Input and output files
-input_file_path = 'util_files/Sydney_0_1024.map'
+input_file_path = 'util_files/Boston_2_256.map'
 output_file_path = 'util_files/output.txt'
 
 

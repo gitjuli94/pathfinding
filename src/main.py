@@ -18,7 +18,7 @@ from tkinter import *
 class PathFindingApp:
     def __init__(self, root):
 
-        self.cell_size = 7
+        self.cell_size = 4
 
         self.root = root
         self.root.title("Path Finding Algorithms")
