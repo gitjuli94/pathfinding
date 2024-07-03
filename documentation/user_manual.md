@@ -47,3 +47,17 @@ Run the algorithms in the GUI using the buttons described below. Use the buttons
 * **Run JPS**: Run the Jump Point Search algorithm, visualize the path, and print the results.
 * **Run Dijkstra**: Run the Dijkstra algorithm, visualize the path, and print the results.
 
+### Running the tests
+
+1) **Ensure the virtual environment "poetry" is running**
+```bash
+poetry shell
+```
+2) **Run the unit tests**
+```bash
+coverage run --branch -m pytest src
+```
+3) **Show the coverage report**
+```bash
+coverage report -m
+```

@@ -82,7 +82,7 @@ Chat-GPT was also utilized to summarize new topics when I was doing the peer rev
 
 ## Summary, conclusion
 
-Both algorithms seem to find the shortest path. The JPS is more efficient especially with big maps where start and end node are selected in a way that the octile heuristic approximation is the most accurate.
+JPS is more efficient, especially with large maps where the start and end nodes are selected in a way that makes the octile heuristic approximation most accurate. Both algorithms always find the goal (when possible) and return the same path length. I added the visualization of processed nodes of both algorithms in the GUI, which helped to illustrate how much fewer nodes JPS processes compared to Dijkstra.
 
 ## References
 
