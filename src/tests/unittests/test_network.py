@@ -9,7 +9,7 @@ from pathlib import Path
 src_dir = Path(__file__).resolve().parent.parent.parent
 sys.path.append(str(src_dir))
 
-from algorithms.network import Generate_Network
+from algorithms.network import GenerateNetwork
 
 class TestNetwork(unittest.TestCase):
     def setUp(self):
@@ -18,7 +18,7 @@ class TestNetwork(unittest.TestCase):
     def test_generate_network_only_obstacles(self):
         # Test network generation of a matrix with only obstacles
         matrix = [[1 for _ in range(6)] for _ in range(6)]
-        network_obstacles = Generate_Network(matrix)
+        network_obstacles = GenerateNetwork(matrix)
         result = network_obstacles.create_graph()
         self.assertEqual(result, {})
 
@@ -26,7 +26,7 @@ class TestNetwork(unittest.TestCase):
         # Test network generation of a big open matrix
         n= 100
         matrix = [[0 for _ in range(n)] for _ in range(n)]
-        network_obstacles = Generate_Network(matrix)
+        network_obstacles = GenerateNetwork(matrix)
         result = network_obstacles.create_graph()
 
         # check amount of keys (nodes)
@@ -45,7 +45,7 @@ class TestNetwork(unittest.TestCase):
             [0, 1, 0],
             [0, 0, 0]
         ]
-        network = Generate_Network(matrix)
+        network = GenerateNetwork(matrix)
         result = network.create_graph()
         expected_graph = {
             (0, 0): [((1, 0), 1), ((0, 1), 1)],
@@ -68,7 +68,7 @@ class TestNetwork(unittest.TestCase):
             [0, 0],
             [0, 1]
         ]
-        network = Generate_Network(matrix)
+        network = GenerateNetwork(matrix)
         network.graph = {(0, 0): []}  # reset graph for the node (0, 0)
         network.add_edges(0, 0)
         expected_network = {(0, 0): [((1, 0), 1), ((0, 1), 1)]} # edges added down and right

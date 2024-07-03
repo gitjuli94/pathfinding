@@ -36,6 +36,7 @@ class Dijkstra:
                 return {
                     "shortestPath": self.reconstruct_path(came_from, end_node),
                     "visited": visited,
+                    "cameFrom": came_from,
                     "absoluteDistance": distances[end_node]
                 }
             if node_a in visited:

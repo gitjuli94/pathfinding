@@ -21,7 +21,8 @@ class TestJPS(unittest.TestCase):
         pass
 
     def test_shortest_path_complex_map_paris(self):
-        # Test scenario from moving AI: NewYork_2_256.map	256	256	236	236	19	25	337.78888855
+        # Test scenario from moving AI:
+        # NewYork_2_256.map	256	256	236	236	19	25	337.78888855
         # route direction: bottom right corner -> upper left corner
         matrix = newyork
         start = (236, 236)
@@ -31,7 +32,8 @@ class TestJPS(unittest.TestCase):
         self.assertEqual(round((result["absoluteDistance"]), 1), (337.8))
 
     def test_shortest_path_complex_map_newyork(self):
-        # Test scenario from moving AI: 95	NewYork_2_256.map	256	256	36	14	232	253	341.27416992
+        # Test scenario from moving AI: 95
+        # NewYork_2_256.map	256	256	36	14	232	253	341.27416992
         # route direction: upper left corner -> bottom right corner
         matrix = newyork
         start = (14,36)
@@ -102,7 +104,8 @@ class TestJPS(unittest.TestCase):
 
         # choose suitable points from the nodes in the graph
         for node in dijkstra.nodes:
-            if len(graph[node]) > 1: # if a node has enough edges, it's not isolated (e.g. inside a building)
+            # if a node has enough edges, it's not isolated (e.g. inside a building)
+            if len(graph[node]) > 1:
                 free_space.append(node)
 
         jps = JPS(matrix)
@@ -114,7 +117,8 @@ class TestJPS(unittest.TestCase):
 
             result_Dijkstra = dijkstra.find_distances(start, end)
             result_JPS = jps.jump_point_search(start, end)
-            self.assertEqual(round((result_Dijkstra["absoluteDistance"]), 1), round((result_JPS["absoluteDistance"]), 1))
+            self.assertEqual(round((result_Dijkstra["absoluteDistance"]), 1),
+                             round((result_JPS["absoluteDistance"]), 1))
 
 
 if __name__ == '__main__':

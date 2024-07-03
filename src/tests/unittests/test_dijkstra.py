@@ -30,7 +30,8 @@ class TestDijkstra(unittest.TestCase):
 
 
     def test_shortest_path_complex_map_paris(self):
-        # Test scenario from moving AI: Paris_0_256.map	256	256	29	9	253	253	388.61731567
+        # Test scenario from moving AI:
+        # Paris_0_256.map	256	256	29	9	253	253	388.61731567
         # route direction: upper left corner -> bottom right corner
         start, end = (9,29), (253,253)
         matrix = paris
@@ -39,7 +40,8 @@ class TestDijkstra(unittest.TestCase):
         self.assertEqual(round((result["absoluteDistance"]), 1), (388.6))
 
     def test_shortest_path_complex_map_newyork(self):
-        # Test scenario from moving AI: NewYork_2_256.map	256	256	245	254	72	32	321.33304443
+        # Test scenario from moving AI:
+        # NewYork_2_256.map	256	256	245	254	72	32	321.33304443
         # route direction: bottom right corner -> upper left corner
         start, end = (254,245), (32,72)
         matrix = newyork

@@ -27,16 +27,6 @@ The Jump point search algorithm is tested in this [file](https://github.com/gitj
 
 ### Unit testing coverage report
 
-The unit testing coverage report can be obtained using the following commands (frameworks "coverage" and "pytest" must be installed):
-
-```bash
-coverage run --branch -m pytest src
-```
-
-```bash
-coverage report -m
-```
-
 ![image](https://github.com/gitjuli94/pathfinding/blob/main/images/coverage_report.jpg)
 
 ## Performance testing

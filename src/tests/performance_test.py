@@ -20,16 +20,16 @@ def perfomance_test(n, map, start, end):
 
     for i in range(n):
         start_time = time.time()
-        result = dijkstra.find_distances(start, end)
+        dijkstra.find_distances(start, end)
         end_time = time.time()
         dijkstra_record.append(end_time - start_time)
 
     d_avg = round((sum(dijkstra_record) / len(dijkstra_record)), 3)
     print(f"Dijkstra average run time: {d_avg} seconds")
 
-    for i in range(n):
+    for _ in range(n):
         start_time = time.time()
-        result = jps.jump_point_search(start, end)
+        jps.jump_point_search(start, end)
         end_time = time.time()
         jps_record.append(end_time - start_time)
 
@@ -54,6 +54,7 @@ if __name__ == "__main__":
     coords = [[(4,234), (243,37)], # newyork
               [(491, 61), (7, 504)], # paris
               [(8,16), (993,982)]] # sydney
+
     n = 100
 
     for i, (name, matrix) in enumerate(maps.items()):
