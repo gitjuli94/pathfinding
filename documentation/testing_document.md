@@ -27,7 +27,7 @@ The Jump point search algorithm is tested in this [file](https://github.com/gitj
 
 ### Unit testing coverage report
 
-The unit testing coverage report can be obtained using the following commands (frameworks coverage and pytest must be installed):
+The unit testing coverage report can be obtained using the following commands (frameworks "coverage" and "pytest" must be installed):
 
 ```bash
 coverage run --branch -m pytest src
@@ -41,7 +41,7 @@ coverage report -m
 
 ## Performance testing
 
-The algorithms are tested with 100 iterations with 3 different maps. The performance test can be run [here](https://github.com/gitjuli94/pathfinding/blob/main/src/tests/performance_test.py "here"). The start and end coordinates are selected from Moving AI scenario files for long routes. The scenario text files also saved in folder "util_files" and can be downloaded from [here](https://www.movingai.com/benchmarks/street/index.html "here").
+The algorithms are tested with 100 iterations with 3 different maps of different sizes. The performance test can be found [here](https://github.com/gitjuli94/pathfinding/blob/main/src/tests/performance_test.py "here"). The start and end coordinates are selected from Moving AI scenario files for long routes. The scenario text files also saved in folder [util_files](https://github.com/gitjuli94/pathfinding/blob/main/util_files "util_files") or can be downloaded [here](https://www.movingai.com/benchmarks/street/index.html "here").
 
 - Test 1: map newyork_256
     - Coordinates: start:(4, 234), end: (243, 37) (y, x)
@@ -50,19 +50,19 @@ The algorithms are tested with 100 iterations with 3 different maps. The perform
 - Test 3: map sydney_1024
     - Coordinates: start:(8, 16), end: (993, 982) (y, x)
 
-***Map: 256x256 New York***
+***Test 1: 256x256 New York***
 | Algorithm           | Run time (avg 100 iterations)            |
 | ------------------- | ---------------------------------------- |
 | Dijkstra            | 0.195 seconds                            |
 | Jump Point Search   | 0.028 seconds                            |
 
-***Map: 512x512 Paris***
+***Test 2: 512x512 Paris***
 | Algorithm           | Run time (avg 100 iterations)            |
 | ------------------- | ---------------------------------------- |
 | Dijkstra            | 0.903 seconds                            |
 | Jump Point Search   | 0.180 seconds                            |
 
-***Map: 1024x1024 Sydney***
+***Test 3: 1024x1024 Sydney***
 
 | Algorithm          | Run time (avg 100 iterations)            |
 | ------------------ | ---------------------------------------- |

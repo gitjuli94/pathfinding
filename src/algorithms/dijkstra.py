@@ -1,6 +1,6 @@
 """
 Dijkstra algorithm for shortest path finding.
-sources:
+references:
 https://tira.mooc.fi/kevat-2024/osa14/
 """
 

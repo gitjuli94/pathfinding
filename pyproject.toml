@@ -9,7 +9,7 @@ readme = "README.md"
 python = "^3.10"
 matplotlib = "^3.9.0"
 numpy = "^1.21.0"
-tkinter = {version = "*", optional = true}
+# tkinter = {version = "*", optional = true}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.1"
