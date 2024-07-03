@@ -4,7 +4,7 @@ from pathlib import Path
 src_dir = Path(__file__).resolve().parent.parent
 sys.path.append(str(src_dir))
 
-from algorithms.JPS import JPS
+from algorithms.jps import JPS
 from algorithms.dijkstra import Dijkstra
 from data.performance_test_maps.newyork_256 import input_matrix as newyork_256
 from data.performance_test_maps.paris_512 import input_matrix as paris_512

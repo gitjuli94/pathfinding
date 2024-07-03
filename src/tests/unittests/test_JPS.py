@@ -11,7 +11,7 @@ import random
 src_dir = Path(__file__).resolve().parent.parent.parent
 sys.path.append(str(src_dir))
 
-from algorithms.JPS import JPS
+from algorithms.jps import JPS
 from algorithms.dijkstra import Dijkstra
 from data.maps.newyork import input_matrix as newyork
 from data.maps.boston_2_256 import input_matrix as boston

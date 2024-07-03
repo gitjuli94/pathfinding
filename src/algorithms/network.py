@@ -1,9 +1,10 @@
 """
-Create a network of nodes and edges for the Dijkstra algorithm using a map with 1/0 syntax as an input.
-Returns a dictionary with the node as the key and the list of adjacent available nodes as the value.
+Create a network of nodes and edges for the Dijkstra algorithm using
+a map with 1/0 syntax as an input. Returns a dictionary with the node
+as the key and the list of adjacent available nodes as the value.
 """
 
-class Generate_Network:
+class GenerateNetwork:
     def __init__(self, matrix):
         self.matrix = matrix
         self.rows = len(matrix)
@@ -31,17 +32,9 @@ class Generate_Network:
 
                 weight = 1 if abs(dx) + abs(dy) == 1 else 2**0.5
                 if weight > 1: # diagonal edge
-                    if self.matrix[ny][x] == 0 and self.matrix[y][nx] == 0: # don't add edges to diagonally pass corners
-                        self.graph[(y, x)].append(((ny, nx), weight))       # (only orthogonal movement around corners)
+                    # don't add edges to diagonally pass corners
+                    # (only orthogonal movement around corners)
+                    if self.matrix[ny][x] == 0 and self.matrix[y][nx] == 0:
+                        self.graph[(y, x)].append(((ny, nx), weight))
                 else:
                     self.graph[(y, x)].append(((ny, nx), weight))
-
-
-"""matrix = [
-            [0, 0, 0],
-            [0, 0, 1],
-            [0, 0, 1]
-        ]
-
-result = Generate_Network(matrix)
-print(result.graph)"""

@@ -78,7 +78,7 @@ Large Language Models (LLM's) weren't used for code generation in the path findi
 
 Chat-GPT was also employed to identify performance and precision issues in the jump point search algorithm and it was quite useful for that purpose. Still, it didn't create the solution for the precision issues (it didn't offer any solutions that would fix the issue). But it gave ideas what was possible to improve in the code.
 
-Chat-GPT was also utilized to summarize new topics when I was doing the peer reviews of other projects. It helped to grasp new concepts quickly and provided clear overviews, making the review process more efficient.
+Chat-GPT was also utilized to summarize new topics when I was doing the peer reviews of other projects. It helped to grasp new concepts quickly and provided clear overviews, making the review process more efficient. It was also used to explain pylint comments.
 
 ## Summary, conclusion
 
